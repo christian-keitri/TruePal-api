@@ -1,0 +1,19 @@
+# Build folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# OS files
+.DS_Store
+
+# Logs
+*.log
+
+# SQLite DB (optional)
+*.db
+
+# Environment / secrets
+appsettings.Development.json
