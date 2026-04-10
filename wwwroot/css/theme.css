@@ -242,3 +242,13 @@ a.link-theme:hover {
     border-color: var(--primary-yellow);
     box-shadow: 0 0 0 0.2rem var(--primary-yellow-glow);
 }
+
+/* Checkbox Override */
+.form-check-input:checked {
+    background-color: var(--primary-yellow);
+    border-color: var(--primary-yellow);
+}
+
+.form-check-input:checked:focus {
+    box-shadow: 0 0 0 0.2rem var(--primary-yellow-glow);
+}
