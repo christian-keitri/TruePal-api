@@ -1,0 +1,244 @@
+/* TruePal Theme - Smokey Yellow & White */
+
+:root {
+    /* Primary Theme Colors */
+    --primary-yellow: #c9a961;
+    --primary-yellow-dark: #b8985a;
+    --primary-yellow-light: rgba(201, 169, 97, 0.1);
+    --primary-yellow-glow: rgba(201, 169, 97, 0.3);
+
+    /* Neutral Colors */
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #e8e8e8;
+    --bg-tertiary: #d6d6d6;
+    --bg-white: #ffffff;
+
+    /* Text Colors */
+    --text-primary: #333;
+    --text-secondary: #666;
+    --text-muted: #999;
+    --text-white: #ffffff;
+
+    /* Spacing Scale */
+    --spacing-xs: 0.25rem;
+    /* 4px */
+    --spacing-sm: 0.5rem;
+    /* 8px */
+    --spacing-md: 1rem;
+    /* 16px */
+    --spacing-lg: 1.5rem;
+    /* 24px */
+    --spacing-xl: 2rem;
+    /* 32px */
+    --spacing-2xl: 3rem;
+    /* 48px */
+    --spacing-3xl: 4rem;
+    /* 64px */
+
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    /* 4px */
+    --radius-md: 0.5rem;
+    /* 8px */
+    --radius-lg: 1rem;
+    /* 16px */
+    --radius-xl: 1.5rem;
+    /* 24px */
+    --radius-pill: 20px;
+    --radius-circle: 50%;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.2);
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* Utility Classes */
+.text-primary {
+    color: var(--primary-yellow) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-yellow) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-yellow) !important;
+}
+
+/* Accent Colors */
+.accent-yellow {
+    color: var(--primary-yellow);
+}
+
+.accent-yellow-bg {
+    background-color: var(--primary-yellow);
+}
+
+/* Spacing Utilities */
+.p-xs {
+    padding: var(--spacing-xs);
+}
+
+.p-sm {
+    padding: var(--spacing-sm);
+}
+
+.p-md {
+    padding: var(--spacing-md);
+}
+
+.p-lg {
+    padding: var(--spacing-lg);
+}
+
+.p-xl {
+    padding: var(--spacing-xl);
+}
+
+.m-xs {
+    margin: var(--spacing-xs);
+}
+
+.m-sm {
+    margin: var(--spacing-sm);
+}
+
+.m-md {
+    margin: var(--spacing-md);
+}
+
+.m-lg {
+    margin: var(--spacing-lg);
+}
+
+.m-xl {
+    margin: var(--spacing-xl);
+}
+
+/* Card Components */
+.theme-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-lg);
+    transition: var(--transition-base);
+}
+
+.theme-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* Bootstrap Card Body Override */
+.card {
+    border-radius: 15px;
+    box-shadow: var(--shadow-md);
+}
+
+.card-body {
+    border: 1px solid var(--primary-yellow);
+    border-radius: 15px;
+}
+
+/* Button Components */
+.btn-theme-primary {
+    background-color: var(--primary-yellow);
+    border-color: var(--primary-yellow);
+    color: var(--text-white);
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+    border: 2px solid var(--primary-yellow);
+}
+
+.btn-theme-primary:hover {
+    background-color: var(--primary-yellow-dark);
+    border-color: var(--primary-yellow-dark);
+    color: var(--text-white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-theme-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary-yellow);
+    color: var(--primary-yellow);
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    transition: var(--transition-base);
+}
+
+.btn-theme-outline:hover {
+    background-color: var(--primary-yellow);
+    color: var(--text-white);
+    transform: translateY(-1px);
+}
+
+/* Badge Components */
+.badge-theme {
+    background-color: var(--primary-yellow);
+    color: var(--text-white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-pill);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Alert Components */
+.alert-theme {
+    background-color: var(--primary-yellow-light);
+    border-left: 4px solid var(--primary-yellow);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+}
+
+/* Icon Styling */
+.icon-theme {
+    color: var(--primary-yellow);
+}
+
+.icon-theme-lg {
+    color: var(--primary-yellow);
+    font-size: 2rem;
+}
+
+.icon-theme-xl {
+    color: var(--primary-yellow);
+    font-size: 3rem;
+}
+
+/* Link Styling */
+a.link-theme {
+    color: var(--primary-yellow);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+a.link-theme:hover {
+    color: var(--primary-yellow-dark);
+    text-decoration: underline;
+}
+
+/* Divider */
+.divider-theme {
+    border-top: 2px solid var(--primary-yellow);
+    margin: var(--spacing-lg) 0;
+}
+
+/* Input Focus States */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 0 0 0.2rem var(--primary-yellow-glow);
+}
