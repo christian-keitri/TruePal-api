@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using TruePal.Api.Data;
-using TruePal.Api.Services;
+using TruePal.Api.Core.Interfaces;
+using TruePal.Api.Application.Services;
+using TruePal.Api.Infrastructure;
+using TruePal.Api.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -11,11 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Services (Dependency Injection)
 //
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
 
 // OpenAPI / Swagger (built-in OpenAPI in .NET 8)
 builder.Services.AddOpenApi();
 
-builder.Services.AddScoped<AuthService>();
+// Dependency Injection - Repositories and Services
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // DATABASE CONFIG
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -39,6 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!))
     };
 });
+
 var app = builder.Build();
 
 //
@@ -49,7 +56,12 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Global error handling middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -57,5 +69,6 @@ app.UseAuthorization();
 // 3. Route mapping
 //
 app.MapControllers();
+app.MapRazorPages();
 
 app.Run();

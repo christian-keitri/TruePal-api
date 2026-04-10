@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using TruePal.Api.Core.Interfaces;
 using TruePal.Api.DTOs;
-using TruePal.Api.Services;
 
 namespace TruePal.Api.Controllers;
 
@@ -8,25 +8,46 @@ namespace TruePal.Api.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthService _auth;
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(AuthService auth)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
-        _auth = auth;
+        _authService = authService;
+        _logger = logger;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
-        var user = await _auth.Register(dto.Username, dto.Email, dto.Password);
-        if (user == null) return BadRequest("User Already Exists");
-        return Ok(user);
+        var result = await _authService.RegisterAsync(dto.Username, dto.Email, dto.Password);
+        
+        if (!result.IsSuccess)
+        {
+            if (result.Errors.Any())
+                return BadRequest(new { errors = result.Errors });
+            return BadRequest(new { error = result.Error });
+        }
+
+        return Ok(new { 
+            id = result.Data!.Id, 
+            username = result.Data.Username, 
+            email = result.Data.Email 
+        });
     }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
-        var token = await _auth.Login(dto.Email, dto.Password);
-        if (token == null) return Unauthorized("Invalid credentials");
-        return Ok(new { token });
+        var result = await _authService.LoginAsync(dto.Email, dto.Password);
+        
+        if (!result.IsSuccess)
+        {
+            if (result.Errors.Any())
+                return Unauthorized(new { errors = result.Errors });
+            return Unauthorized(new { error = result.Error });
+        }
+
+        return Ok(new { token = result.Data });
     }
 }
