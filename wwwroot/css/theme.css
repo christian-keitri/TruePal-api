@@ -252,3 +252,38 @@ a.link-theme:hover {
 .form-check-input:checked:focus {
     box-shadow: 0 0 0 0.2rem var(--primary-yellow-glow);
 }
+
+/* Tab Navigation Styling */
+.nav-tabs .nav-link {
+    border-radius: var(--radius-pill);
+    padding: var(--spacing-sm) var(--spacing-md);
+    transition: all 0.3s ease;
+    color: var(--text-primary) !important;
+    border: none;
+    margin-right: 8px;
+}
+
+.nav-tabs .nav-link i {
+    color: var(--primary-yellow);
+}
+
+.nav-tabs .nav-link:hover {
+    background: var(--primary-yellow-light);
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    background: var(--primary-yellow);
+    color: white !important;
+    font-weight: 700;
+    box-shadow: 0 4px 15px var(--primary-yellow-glow);
+    border: none;
+}
+
+.nav-tabs .nav-link.active i {
+    color: white;
+}
+
+.nav-tabs {
+    border-bottom: 2px solid var(--primary-yellow-light);
+}
