@@ -16,6 +16,7 @@ dotnet run
 
 ### Getting Started
 - **[QUICKSTART.md](QUICKSTART.md)** - Run the app and test API endpoints
+- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - Mandatory coding patterns and rules
 - **[THEME_GUIDE.md](THEME_GUIDE.md)** - CSS variables and design system
 
 ### Architecture Guides
