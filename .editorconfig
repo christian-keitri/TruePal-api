@@ -1,6 +1,10 @@
 # .editorconfig - Code Style Rules
 # https://editorconfig.org
-
+#
+# IMPORTANT: Also read these standards documents:
+# - CODING_STANDARDS.md (30 rules for code quality)
+# - UI_UX_STANDARDS.md (36 rules for design consistency)
+#
 root = true
 
 # All files

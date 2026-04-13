@@ -17,6 +17,8 @@ dotnet run
 ### 🚀 For Developers (Start Here)
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ **NEW DEVELOPERS START HERE** - Development workflow and guidelines
 - **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - 30 mandatory coding rules
+- **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** ⭐ **REQUIRED READING** - 36 UI/UX design rules
+- **[UI_UX_QUICK_REFERENCE.md](UI_UX_QUICK_REFERENCE.md)** 📋 **QUICK REFERENCE** - Cheat sheet for common patterns
 
 ### Getting Started
 - **[QUICKSTART.md](QUICKSTART.md)** - Run the app and test API endpoints

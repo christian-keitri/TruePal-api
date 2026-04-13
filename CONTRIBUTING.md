@@ -2,9 +2,11 @@
 
 ## 🎯 Before You Start
 
-**MANDATORY:** Read [CODING_STANDARDS.md](CODING_STANDARDS.md) before writing any code.
+**MANDATORY READING:**
+1. **[CODING_STANDARDS.md](CODING_STANDARDS.md)** - Code quality rules
+2. **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** - Design and UI rules
 
-All contributions must follow the established coding standards and architectural patterns.
+All contributions must follow the established coding standards and design patterns.
 
 ---
 
@@ -23,7 +25,8 @@ dotnet run
 ```
 
 ### 2. Read the Documentation
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED** - Development rules
+- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED** - Development rules (30 rules)
+- **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** ⭐ **REQUIRED** - Design rules (36 rules)
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Understanding the architecture
 - **[MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md)** - MVC patterns
 
@@ -78,9 +81,13 @@ git commit -m "feat: descriptive commit message"
 
 ### 8. Submit Pull Request
 Before submitting, verify:
-- [ ] Follows [CODING_STANDARDS.md](CODING_STANDARDS.md)
+- [ ] Follows [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)
 - [ ] Uses existing reusable components
 - [ ] Builds without errors
+- [ ] All pages tested manually
+- [ ] Responsive on mobile (375px) to desktop (1920px)
+- [ ] No hardcoded CSS values (uses variables)
+- [ ] Accessible (WCAG AA compliant)
 - [ ] All pages tested manually
 - [ ] No exposed sensitive data
 - [ ] ViewModels are strongly-typed
@@ -99,6 +106,16 @@ Before submitting, verify:
 - [ ] No hardcoded values
 - [ ] Uses CSS variables from theme
 
+### UI/UX Quality
+- [ ] Responsive design (mobile 375px to desktop 1920px)
+- [ ] Uses CSS variables (no hardcoded colors/spacing)
+- [ ] Bootstrap components used correctly
+- [ ] Proper hover/focus states
+- [ ] Accessible (ARIA labels, alt text, keyboard navigation)
+- [ ] Meets WCAG AA contrast requirements
+- [ ] Bootstrap Icons only (no mixed icon sets)
+- [ ] Mobile-first CSS approach
+
 ### Security
 - [ ] No passwords in plain text
 - [ ] User input escaped
@@ -116,7 +133,7 @@ Before submitting, verify:
 ### Documentation
 - [ ] Code comments where needed
 - [ ] README updated if needed
-- [ ] New components documented
+- [ ] New components documented in CSS_ARCHITECTURE.md
 
 ---
 
@@ -173,10 +190,12 @@ if (exists) return Result<User>.Failure("User already exists");
 ## 🆘 Getting Help
 
 ### Documentation Resources
-1. [CODING_STANDARDS.md](CODING_STANDARDS.md) - Coding rules
-2. [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture overview
-3. [MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md) - MVC patterns
-4. [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) - CSS organization
+1. [CODING_STANDARDS.md](CODING_STANDARDS.md) - Code quality rules
+2. [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md) - Design and UI rules
+3. [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture overview
+4. [MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md) - MVC patterns
+5. [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) - CSS organization
+6. [THEME_GUIDE.md](THEME_GUIDE.md) - CSS variables reference
 
 ### Questions?
 - Check existing documentation first
@@ -201,9 +220,11 @@ if (exists) return Result<User>.Failure("User already exists");
 
 ### Week 3: Standards
 1. Read [CODING_STANDARDS.md](CODING_STANDARDS.md) thoroughly
-2. Review all 30 rules
-3. Study code examples
-4. Practice with small changes
+2. Read [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md) thoroughly
+3. Review all coding rules (30 rules)
+4. Review all UI/UX rules (36 rules)
+5. Study code examples
+6. Practice with small changes
 
 ### Week 4: Contributing
 1. Pick a small feature
