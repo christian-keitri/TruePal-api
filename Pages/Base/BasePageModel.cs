@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -12,66 +13,52 @@ public abstract class BasePageModel : PageModel
         _logger = logger;
     }
 
-    /// <summary>
-    /// Display a single error message
-    /// </summary>
     [TempData]
     public string? ErrorMessage { get; set; }
 
     /// <summary>
-    /// Display multiple error messages
+    /// Stored as JSON string so it survives TempData cookie serialization.
     /// </summary>
     [TempData]
-    public List<string>? ErrorMessages { get; set; }
+    public string? ErrorMessagesJson { get; set; }
 
-    /// <summary>
-    /// Display a success message
-    /// </summary>
     [TempData]
     public string? SuccessMessage { get; set; }
 
-    /// <summary>
-    /// Display an info message
-    /// </summary>
     [TempData]
     public string? InfoMessage { get; set; }
 
-    /// <summary>
-    /// Check if there are any error messages
-    /// </summary>
-    public bool HasErrors => !string.IsNullOrEmpty(ErrorMessage) || (ErrorMessages?.Any() ?? false);
+    [TempData]
+    public string? WarningMessage { get; set; }
 
-    /// <summary>
-    /// Check if there is a success message
-    /// </summary>
+    public List<string> ErrorMessages
+    {
+        get => string.IsNullOrEmpty(ErrorMessagesJson)
+            ? new List<string>()
+            : JsonSerializer.Deserialize<List<string>>(ErrorMessagesJson) ?? new List<string>();
+    }
+
+    public bool HasErrors => !string.IsNullOrEmpty(ErrorMessage) || !string.IsNullOrEmpty(ErrorMessagesJson);
     public bool HasSuccess => !string.IsNullOrEmpty(SuccessMessage);
-
-    /// <summary>
-    /// Check if there is an info message
-    /// </summary>
     public bool HasInfo => !string.IsNullOrEmpty(InfoMessage);
 
-    /// <summary>
-    /// Add a single error message
-    /// </summary>
     protected void AddError(string message)
     {
         if (!string.IsNullOrEmpty(message))
         {
-            ErrorMessages ??= new List<string>();
-            ErrorMessages.Add(message);
+            var list = ErrorMessages;
+            list.Add(message);
+            ErrorMessagesJson = JsonSerializer.Serialize(list);
         }
     }
 
-    /// <summary>
-    /// Add multiple error messages
-    /// </summary>
     protected void AddErrors(IEnumerable<string> messages)
     {
         if (messages != null && messages.Any())
         {
-            ErrorMessages ??= new List<string>();
-            ErrorMessages.AddRange(messages);
+            var list = ErrorMessages;
+            list.AddRange(messages);
+            ErrorMessagesJson = JsonSerializer.Serialize(list);
         }
     }
 

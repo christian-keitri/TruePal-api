@@ -11,35 +11,6 @@
                 <div class="card-body">
                     <h2 class="card-title text-center mb-4">Login</h2>
                     
-                    @if (Model.HasSuccess)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            @Model.SuccessMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            @Model.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-
-                    @if (Model.ErrorMessages?.Any() == true)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <ul class="mb-0">
-                                @foreach (var error in Model.ErrorMessages)
-                                {
-                                    <li>@error</li>
-                                }
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-
                     <form method="post">
                         <input type="hidden" asp-for="ReturnUrl" />
                         
