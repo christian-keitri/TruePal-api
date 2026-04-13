@@ -15,7 +15,8 @@ This document defines the mandatory coding patterns and reusable components for 
 7. [Validation Rules](#validation-rules)
 8. [CSS & Component Rules](#css--component-rules)
 9. [Security Rules](#security-rules)
-10. [Naming Conventions](#naming-conventions)
+10. [Testing Requirements](#testing-requirements)
+11. [Naming Conventions](#naming-conventions)
 
 ---
 
@@ -577,9 +578,237 @@ bool isValid = BCrypt.Net.BCrypt.Verify(password, hashedPassword);
 
 ---
 
+## 🧪 Testing Requirements
+
+### ✅ RULE 27: All Features MUST Include Tests
+**📌 MANDATORY - When you add or modify a feature, you MUST update tests.**
+
+**✅ REQUIRED Pattern:**
+```csharp
+// When you create a new service method:
+public async Task<Result<User>> CreateUserAsync(RegisterRequest request)
+{
+    // Implementation...
+}
+
+// You MUST create corresponding tests:
+[Fact]
+public async Task CreateUserAsync_ShouldCreateUser_WhenValidDataProvided()
+{
+    // Arrange
+    var request = new RegisterRequest
+    {
+        Email = "test@example.com",
+        Username = "testuser",
+        Password = "Password123!"
+    };
+
+    // Act
+    var result = await _userService.CreateUserAsync(request);
+
+    // Assert
+    result.IsSuccess.Should().BeTrue();
+    result.Value.Email.Should().Be("test@example.com");
+}
+```
+
+**Why:** Ensures code quality, prevents regressions, documents expected behavior, enables safe refactoring.
+
+---
+
+### ✅ RULE 28: Test Coverage Requirements
+**MINIMUM Coverage for Each Feature:**
+
+**Repository/Data Layer:**
+- ✅ CREATE: At least 2 tests (success case, edge cases)
+- ✅ READ: At least 3 tests (exists, not exists, query filters)
+- ✅ UPDATE: At least 2 tests (success, validation failures)
+- ✅ DELETE: At least 2 tests (success, cascading effects)
+
+**Service Layer:**
+- ✅ Success path test
+- ✅ Validation failure tests
+- ✅ Business logic edge cases
+- ✅ Error handling tests
+
+**Example - Complete Coverage:**
+```csharp
+public class UserServiceTests
+{
+    // CREATE Tests
+    [Fact]
+    public async Task CreateUser_ShouldSucceed_WhenValidData() { }
+    
+    [Fact]
+    public async Task CreateUser_ShouldFail_WhenEmailExists() { }
+    
+    [Fact]
+    public async Task CreateUser_ShouldFail_WhenPasswordTooWeak() { }
+    
+    // READ Tests
+    [Fact]
+    public async Task GetUserById_ShouldReturnUser_WhenExists() { }
+    
+    [Fact]
+    public async Task GetUserById_ShouldReturnNull_WhenNotExists() { }
+    
+    // UPDATE Tests
+    [Fact]
+    public async Task UpdateUser_ShouldSucceed_WhenValidChanges() { }
+    
+    [Fact]
+    public async Task UpdateUser_ShouldPreserveCreatedDate() { }
+    
+    // DELETE Tests
+    [Fact]
+    public async Task DeleteUser_ShouldRemove_WhenExists() { }
+}
+```
+
+---
+
+### ✅ RULE 29: Use Arrange-Act-Assert Pattern
+**✅ REQUIRED Test Structure:**
+```csharp
+[Fact]
+public async Task MethodName_ExpectedBehavior_StateUnderTest()
+{
+    // Arrange - Set up test data and dependencies
+    var user = new User
+    {
+        Username = "testuser",
+        Email = "test@example.com"
+    };
+    await _repository.AddAsync(user);
+    await _context.SaveChangesAsync();
+
+    // Act - Execute the method being tested
+    var result = await _repository.GetByEmailAsync("test@example.com");
+
+    // Assert - Verify the expected outcome
+    result.Should().NotBeNull();
+    result!.Username.Should().Be("testuser");
+}
+```
+
+**Why:** Clear test structure, easy to understand, maintainable.
+
+---
+
+### ✅ RULE 30: Test Naming Convention
+**Format:** `MethodName_ExpectedBehavior_StateUnderTest`
+
+**✅ GOOD Examples:**
+```csharp
+CreateUserAsync_ShouldReturnSuccess_WhenValidDataProvided
+GetUserByEmail_ShouldReturnNull_WhenEmailNotFound
+UpdateUser_ShouldPreserveCreatedAt_WhenUpdatingProfile
+DeleteUser_ShouldRemoveUser_WhenUserExists
+ValidatePassword_ShouldReturnFalse_WhenPasswordIsTooShort
+```
+
+**❌ BAD Examples:**
+```csharp
+TestCreateUser()  // Not descriptive
+Test1()           // Meaningless
+UserTest()        // Vague
+```
+
+---
+
+### ✅ RULE 31: Use FluentAssertions for Readable Tests
+**❌ BAD - Traditional Assert:**
+```csharp
+Assert.NotNull(result);
+Assert.Equal("test@example.com", result.Email);
+Assert.True(result.IsActive);
+```
+
+**✅ GOOD - FluentAssertions:**
+```csharp
+result.Should().NotBeNull();
+result!.Email.Should().Be("test@example.com");
+result.IsActive.Should().BeTrue();
+```
+
+**Why:** More readable, better error messages, chainable assertions.
+
+---
+
+### ✅ RULE 32: Isolate Tests with In-Memory Database
+**✅ REQUIRED Pattern:**
+```csharp
+public class UserRepositoryTests : IDisposable
+{
+    private readonly AppDbContext _context;
+    private readonly UserRepository _repository;
+
+    public UserRepositoryTests()
+    {
+        // Create unique in-memory database for each test class
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+
+        _context = new AppDbContext(options);
+        _repository = new UserRepository(_context);
+    }
+
+    public void Dispose()
+    {
+        _context.Database.EnsureDeleted();
+        _context.Dispose();
+    }
+}
+```
+
+**Why:** Test isolation, no external dependencies, fast execution, deterministic results.
+
+---
+
+### ✅ RULE 33: Run Tests Before Committing
+**MANDATORY Before Every Commit:**
+```bash
+# Run all tests
+cd TruePal.Api.Tests
+dotnet test
+
+# Verify all tests pass
+# ✅ All tests must be green before committing
+```
+
+**Pull Request Requirements:**
+- [ ] All existing tests still pass
+- [ ] New tests added for new features
+- [ ] Test coverage meets minimum requirements
+- [ ] No commented-out or skipped tests without justification
+
+---
+
+### ✅ RULE 34: Test File Organization
+**Structure mirrors source code:**
+```
+TruePal.Api.Tests/
+├── Repositories/
+│   ├── UserRepositoryTests.cs
+│   └── PostRepositoryTests.cs
+├── Services/
+│   ├── AuthServiceTests.cs
+│   └── PostServiceTests.cs
+└── Integration/
+    ├── UserIntegrationTests.cs
+    └── PostIntegrationTests.cs
+```
+
+**Naming Convention:**
+- Test file: `{ClassBeingTested}Tests.cs`
+- Test class: `public class {ClassBeingTested}Tests`
+
+---
+
 ## 📛 Naming Conventions
 
-### ✅ RULE 27: Follow C# Naming Standards
+### ✅ RULE 35: Follow C# Naming Standards
 | Type | Convention | Example |
 |------|-----------|---------|
 | Classes | PascalCase | `PostService`, `UserRepository` |
@@ -591,7 +820,7 @@ bool isValid = BCrypt.Net.BCrypt.Verify(password, hashedPassword);
 
 ---
 
-### ✅ RULE 28: Async Method Naming
+### ✅ RULE 36: Async Method Naming
 **✅ All async methods must end with "Async":**
 ```csharp
 public async Task<Result<Post>> CreatePostAsync(Post post)
@@ -600,7 +829,7 @@ public async Task<User?> GetUserByIdAsync(int id)
 
 ---
 
-### ✅ RULE 29: Controller Action Naming
+### ✅ RULE 37: Controller Action Naming
 **Use HTTP verb naming:**
 ```csharp
 [HttpGet]
@@ -612,7 +841,7 @@ public IActionResult Create(CreatePostViewModel model) { } // Processes form
 
 ---
 
-### ✅ RULE 30: File Organization
+### ✅ RULE 38: File Organization
 **Controllers:** `Controllers/FeatureController.cs`
 ```
 Controllers/
@@ -650,6 +879,9 @@ When adding a new feature, follow this checklist:
 - [ ] **CSS**: Component styles in `wwwroot/css/components/`, page styles in `pages/`
 - [ ] **Security**: User input escaped, passwords hashed, cookies HttpOnly+Secure
 - [ ] **DI Registration**: Service registered in `Program.cs`
+- [ ] **Tests**: Created/updated tests for new/modified functionality (MANDATORY)
+- [ ] **Test Coverage**: Minimum coverage requirements met
+- [ ] **All Tests Pass**: `dotnet test` runs successfully
 
 ---
 
@@ -667,16 +899,23 @@ When adding a new feature, follow this checklist:
 ## ⚖️ Enforcement
 
 **These are MANDATORY standards.** All pull requests must:
-1. ✅ Follow these coding standards
+1. ✅ Follow these coding standards (38 rules)
 2. ✅ Use existing reusable components
-3. ✅ Pass code review checklist
-4. ✅ Build without errors
-5. ✅ Include appropriate documentation updates
+3. ✅ **Include tests for all new/modified features** ⚠️ **NON-NEGOTIABLE**
+4. ✅ **All tests pass (dotnet test)** ⚠️ **BLOCKING REQUIREMENT**
+5. ✅ Pass code review checklist
+6. ✅ Build without errors
+7. ✅ Include appropriate documentation updates
 
 **Non-compliance will result in PR rejection.**
+
+**Testing is MANDATORY:**
+- ❌ PRs without tests → Automatic rejection
+- ❌ Failing tests → PR blocked until fixed
+- ✅ Complete test coverage → Faster review & merge
 
 ---
 
 **Last Updated:** April 13, 2026  
-**Version:** 1.0  
+**Version:** 2.0  
 **Maintained by:** TruePal Development Team

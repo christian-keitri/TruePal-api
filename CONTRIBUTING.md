@@ -54,18 +54,63 @@ Refer to [CODING_STANDARDS.md](CODING_STANDARDS.md) for:
 - Security rules
 - Naming conventions
 
-### 6. Test Your Changes
+### 6. Write/Update Tests (MANDATORY)
+**⚠️ REQUIRED: All features MUST include tests**
+
 ```bash
+# Navigate to test project
+cd TruePal.Api.Tests
+
+# Run existing tests to ensure nothing broke
+dotnet test
+
+# Create tests for your new feature in appropriate folder:
+# - Repositories/ for repository tests
+# - Services/ for service tests  
+# - Integration/ for end-to-end tests
+```
+
+**Minimum Test Requirements:**
+- ✅ At least 1 test for success case
+- ✅ At least 1 test for failure/validation case
+- ✅ Follow Arrange-Act-Assert pattern
+- ✅ Use descriptive test names: `MethodName_ExpectedBehavior_StateUnderTest`
+
+**Example:**
+```csharp
+[Fact]
+public async Task CreateUser_ShouldSucceed_WhenValidDataProvided()
+{
+    // Arrange
+    var user = new User { Email = "test@example.com" };
+    
+    // Act
+    await _repository.AddAsync(user);
+    await _context.SaveChangesAsync();
+    
+    // Assert
+    user.Id.Should().BeGreaterThan(0);
+}
+```
+
+### 7. Test Your Changes
+```bash
+# Run all tests (MANDATORY before commit)
+cd TruePal.Api.Tests
+dotnet test
+# ✅ All tests must pass
+
 # Build the project
+cd ../
 dotnet build
 
 # Run the application
 dotnet run
 
-# Test all affected pages
+# Manually test all affected pages
 ```
 
-### 7. Commit Your Changes
+### 8. Commit Your Changes
 ```bash
 git add .
 git commit -m "feat: descriptive commit message"
@@ -79,8 +124,12 @@ git commit -m "feat: descriptive commit message"
 - `style:` Code style changes (formatting)
 - `test:` Adding tests
 
-### 8. Submit Pull Request
+### 9. Submit Pull Request
 Before submitting, verify:
+- [ ] **Tests Added/Updated** - MANDATORY for all features ⚠️
+- [ ] **All Tests Pass** - Run `dotnet test` successfully ⚠️
+- [ ] **Test Coverage** - Minimum requirements met (see CODING_STANDARDS.md Rule 28) ⚠️
+- [ ] Follows [CODING_STANDARDS.md](CODING_STANDARDS.md) (38 rules)
 - [ ] Follows [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)
 - [ ] Uses existing reusable components
 - [ ] Builds without errors
@@ -88,7 +137,6 @@ Before submitting, verify:
 - [ ] Responsive on mobile (375px) to desktop (1920px)
 - [ ] No hardcoded CSS values (uses variables)
 - [ ] Accessible (WCAG AA compliant)
-- [ ] All pages tested manually
 - [ ] No exposed sensitive data
 - [ ] ViewModels are strongly-typed
 - [ ] Services return `Result<T>`

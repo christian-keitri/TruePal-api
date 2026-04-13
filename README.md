@@ -16,7 +16,8 @@ dotnet run
 
 ### 🚀 For Developers (Start Here)
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ **NEW DEVELOPERS START HERE** - Development workflow and guidelines
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - 30 mandatory coding rules
+- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - 38 mandatory coding rules (includes testing)
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** ⭐ **TESTING REQUIRED** - Testing quick reference and templates
 - **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** ⭐ **REQUIRED READING** - 36 UI/UX design rules
 - **[UI_UX_QUICK_REFERENCE.md](UI_UX_QUICK_REFERENCE.md)** 📋 **QUICK REFERENCE** - Cheat sheet for common patterns
 
@@ -55,6 +56,7 @@ dotnet run
 - ✅ **Repository Pattern** - Abstracted data access
 - ✅ **Unit of Work** - Transaction management
 - ✅ **Result Pattern** - Type-safe error handling
+- ✅ **Comprehensive Testing** - xUnit tests for all CRUD operations (MANDATORY for all features)
 - ✅ **JWT Authentication** - Secure token-based auth
 - ✅ **Cookie-based Sessions** - HttpOnly secure cookies
 - ✅ **Input Validation** - Data annotations with client & server validation
@@ -73,7 +75,11 @@ TruePal.Api/
 │   └── ApiAuth/ApiPosts/ApiUsers    # REST API Controllers
 ├── Views/                    # Razor Views (.cshtml)
 │   ├── Auth/Dashboard/Profile/Home  # Feature-based views
-│   └── Shared/              # Layouts & components
+│   TruePal.Api.Tests/       # ⭐ Test Project (xUnit)
+│   ├── Repositories/        # Repository tests
+│   ├── Services/            # Service tests
+│   └── Integration/         # End-to-end tests
+├── └── Shared/              # Layouts & components
 ├── Core/                     # Domain layer
 │   ├── Common/              # Result pattern
 │   ├── Interfaces/          # Service & repository contracts
