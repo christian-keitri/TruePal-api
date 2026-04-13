@@ -53,8 +53,22 @@
 .flex-card-user {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 10px;
+}
+
+.flex-card-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-yellow);
+    border-radius: var(--radius-circle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-white);
+    flex-shrink: 0;
 }
 
 .flex-card-name {
