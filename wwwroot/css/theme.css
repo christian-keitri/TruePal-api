@@ -183,6 +183,28 @@
     transform: translateY(-1px);
 }
 
+/* Bootstrap Button Overrides */
+.btn-primary {
+    background-color: var(--primary-yellow) !important;
+    border-color: var(--primary-yellow) !important;
+    color: var(--text-white) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-yellow-dark) !important;
+    border-color: var(--primary-yellow-dark) !important;
+    color: var(--text-white) !important;
+}
+
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: var(--primary-yellow-dark) !important;
+    border-color: var(--primary-yellow-dark) !important;
+    color: var(--text-white) !important;
+    box-shadow: 0 0 0 0.2rem var(--primary-yellow-glow) !important;
+}
+
 /* Badge Components */
 .badge-theme {
     background-color: var(--primary-yellow);
