@@ -1,0 +1,152 @@
+/* ===== HOME PAGE STYLES ===== */
+/* Styles specific to the landing page with interactive map */
+
+/* Override layout padding for immersive map */
+main[role="main"].home-page {
+    padding: 0 !important;
+}
+
+/* ===== HERO MAP SECTION ===== */
+.map-hero {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - var(--navbar-height));
+    overflow: hidden;
+}
+
+#philippine-map {
+    width: 100%;
+    height: 100%;
+}
+
+/* ===== REGION CHIPS (bottom of map) ===== */
+.region-chips {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 20px;
+    pointer-events: none;
+}
+
+.region-chip {
+    pointer-events: all;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 169, 97, 0.3);
+    color: #333;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+
+.region-chip:hover,
+.region-chip.active {
+    background: var(--primary-yellow);
+    color: #fff;
+    border-color: var(--primary-yellow);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(201, 169, 97, 0.4);
+}
+
+/* ===== MARKER PINS ===== */
+.map-pin {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.map-pin:hover {
+    transform: scale(1.2);
+}
+
+.map-pin-inner {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-yellow);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 12px rgba(201, 169, 97, 0.5);
+}
+
+.map-pin-inner i {
+    transform: rotate(45deg);
+    color: #fff;
+    font-size: 1rem;
+}
+
+.map-pin-pulse {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(201, 169, 97, 0.3);
+    animation: pulse-ring 2s ease-out infinite;
+    top: 0;
+    left: 0;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* ===== MAP CONTROLS OVERRIDE ===== */
+.maplibregl-ctrl-group {
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.maplibregl-ctrl-group button {
+    width: 36px !important;
+    height: 36px !important;
+}
+
+.maplibregl-ctrl-top-right {
+    top: 70px !important;
+    right: 12px !important;
+}
+
+.maplibregl-ctrl-attrib {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 8px !important;
+    font-size: 0.65rem !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .region-chips {
+        bottom: 16px;
+        gap: 6px;
+    }
+
+    .region-chip {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+}

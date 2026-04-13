@@ -237,7 +237,8 @@
     </nav>
 
     <!-- Main Content -->
-    <main role="main" class="pb-3">
+    <!-- Main Content -->
+    <main role="main" class="pb-3 @ViewData["MainClass"]">
         <partial name="_StatusMessages" />
         @RenderBody()
     </main>

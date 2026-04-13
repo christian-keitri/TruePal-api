@@ -1,0 +1,85 @@
+/* ===== OVERLAY COMPONENTS ===== */
+/* Modal overlays, auth overlays, and floating UI elements */
+
+/* Auth Overlay */
+.auth-overlay {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: 24px 28px;
+    max-width: 340px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(201, 169, 97, 0.2);
+}
+
+.auth-overlay h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 6px;
+    color: var(--text-primary);
+}
+
+.auth-overlay p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+    line-height: 1.4;
+}
+
+.auth-overlay .btn-group-auth {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-overlay .btn {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 8px 20px;
+    font-size: 0.85rem;
+}
+
+/* Map Overlay Header */
+.map-overlay-header {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    text-align: center;
+    pointer-events: none;
+}
+
+.map-overlay-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-white);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.map-overlay-header p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+    margin: 4px 0 0;
+}
+
+/* Responsive Overlays */
+@media (max-width: 768px) {
+    .auth-overlay {
+        left: 12px;
+        right: 12px;
+        bottom: 60px;
+        max-width: none;
+    }
+
+    .map-overlay-header h1 {
+        font-size: 1.4rem;
+    }
+}

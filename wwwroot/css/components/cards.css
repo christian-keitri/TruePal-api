@@ -1,0 +1,124 @@
+/* ===== CARD COMPONENTS ===== */
+/* Reusable card styles for posts, profiles, and other content */
+
+/* Base Flex Card */
+.flex-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+    border: 1px solid #eee;
+    transition: all var(--transition-base);
+}
+
+.flex-card:hover {
+    border-color: var(--primary-yellow);
+    box-shadow: 0 8px 24px rgba(201, 169, 97, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Card Image Section */
+.flex-card-image {
+    width: 100%;
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.flex-card-image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+
+.flex-card-image-overlay .badge {
+    background: var(--primary-yellow);
+    color: var(--text-white);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+/* Card Body */
+.flex-card-body {
+    padding: 14px 16px;
+}
+
+/* Card User Section */
+.flex-card-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.flex-card-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.flex-card-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Card Content */
+.flex-card-content {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #444;
+    margin-bottom: 12px;
+}
+
+/* Card Actions */
+.flex-card-actions {
+    display: flex;
+    gap: 16px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.flex-card-action {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.flex-card-action:hover {
+    color: var(--primary-yellow);
+}
+
+.flex-card-action .count {
+    font-weight: 600;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--primary-yellow);
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-top: 12px;
+    font-size: 0.9rem;
+}
