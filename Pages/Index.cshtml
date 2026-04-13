@@ -2,6 +2,731 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Home";
+    Layout = "_Layout";
 }
 
-<partial name="_MainScreen" model="Model" />
+@section Styles {
+    <!-- MapLibre GL JS — free, no API key needed -->
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+    <style>
+        /* Override layout padding for immersive map */
+        main[role="main"] {
+            padding: 0 !important;
+        }
+
+        /* ===== HERO MAP SECTION ===== */
+        .map-hero {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 62px);
+            overflow: hidden;
+        }
+
+        #philippine-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ===== OVERLAY HEADER ===== */
+        .map-overlay-header {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .map-overlay-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .map-overlay-header p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+            margin: 4px 0 0;
+        }
+
+        /* ===== REGION CHIPS (bottom of map) ===== */
+        .region-chips {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+
+        .region-chip {
+            pointer-events: all;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(201,169,97,0.3);
+            color: #333;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .region-chip:hover,
+        .region-chip.active {
+            background: var(--primary-yellow);
+            color: #fff;
+            border-color: var(--primary-yellow);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(201,169,97,0.4);
+        }
+
+        /* ===== MARKER PINS ===== */
+        .map-pin {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .map-pin:hover {
+            transform: scale(1.2);
+        }
+
+        .map-pin-inner {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-yellow);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 12px rgba(201,169,97,0.5);
+        }
+
+        .map-pin-inner i {
+            transform: rotate(45deg);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .map-pin-pulse {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.3);
+            animation: pulse-ring 2s ease-out infinite;
+            top: 0;
+            left: 0;
+        }
+
+        @@keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* ===== POSTS SIDE PANEL ===== */
+        .posts-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 420px;
+            height: 100%;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 20;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+        }
+
+        .posts-panel.open {
+            transform: translateX(0);
+        }
+
+        .posts-panel-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid rgba(201,169,97,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .posts-panel-header h4 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .posts-panel-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-yellow-light);
+            color: var(--primary-yellow);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .posts-panel-close:hover {
+            background: var(--primary-yellow);
+            color: #fff;
+        }
+
+        .posts-panel-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .posts-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 24px;
+        }
+
+        /* ===== POST CARDS ===== */
+        .flex-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .flex-card:hover {
+            border-color: var(--primary-yellow);
+            box-shadow: 0 8px 24px rgba(201,169,97,0.15);
+            transform: translateY(-2px);
+        }
+
+        .flex-card-image {
+            width: 100%;
+            height: 160px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .flex-card-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6));
+        }
+
+        .flex-card-image-overlay .badge {
+            background: var(--primary-yellow);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .flex-card-body {
+            padding: 14px 16px;
+        }
+
+        .flex-card-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .flex-card-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-yellow-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .flex-card-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .flex-card-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .flex-card-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #444;
+            margin-bottom: 12px;
+        }
+
+        .flex-card-actions {
+            display: flex;
+            gap: 16px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .flex-card-action {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .flex-card-action:hover {
+            color: var(--primary-yellow);
+        }
+
+        .flex-card-action .count {
+            font-weight: 600;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--primary-yellow);
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            color: #999;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== AUTH OVERLAY (not logged in) ===== */
+        .auth-overlay {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px;
+            padding: 24px 28px;
+            max-width: 340px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(201,169,97,0.2);
+        }
+
+        .auth-overlay h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 0 0 6px;
+            color: #333;
+        }
+
+        .auth-overlay p {
+            font-size: 0.85rem;
+            color: #666;
+            margin: 0 0 16px;
+            line-height: 1.4;
+        }
+
+        .auth-overlay .btn-group-auth {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-overlay .btn {
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+        }
+
+        /* ===== MAP CONTROLS OVERRIDE ===== */
+        .maplibregl-ctrl-group {
+            border-radius: 12px !important;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+        }
+
+        .maplibregl-ctrl-group button {
+            width: 36px !important;
+            height: 36px !important;
+        }
+
+        .maplibregl-ctrl-top-right {
+            top: 70px !important;
+            right: 12px !important;
+        }
+
+        .maplibregl-ctrl-attrib {
+            background: rgba(255,255,255,0.6) !important;
+            border-radius: 8px !important;
+            font-size: 0.65rem !important;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 768px) {
+            .posts-panel {
+                width: 100%;
+                border-radius: 20px 20px 0 0;
+                height: 60%;
+                top: auto;
+                bottom: 0;
+                transform: translateY(100%);
+            }
+            .posts-panel.open {
+                transform: translateY(0);
+            }
+            .map-overlay-header h1 {
+                font-size: 1.4rem;
+            }
+            .region-chips {
+                bottom: 16px;
+                gap: 6px;
+            }
+            .region-chip {
+                font-size: 0.7rem;
+                padding: 5px 10px;
+            }
+            .auth-overlay {
+                left: 12px;
+                right: 12px;
+                bottom: 60px;
+                max-width: none;
+            }
+        }
+    </style>
+}
+
+<!-- FULL-SCREEN MAP HERO -->
+<div class="map-hero">
+    <div id="philippine-map"></div>
+
+    <div class="map-overlay-header">
+        <h1>Explore the Philippines</h1>
+        <p>Tap a pin to see what people are flexing about</p>
+    </div>
+
+    @if (!Model.IsAuthenticated)
+    {
+        <div class="auth-overlay">
+            <h2>Join TruePal</h2>
+            <p>Connect with travelers and share your favorite spots across the Philippines.</p>
+            <div class="btn-group-auth">
+                <a asp-page="/Auth/Login" class="btn btn-primary">Log In</a>
+                <a asp-page="/Auth/Register" class="btn btn-outline-primary">Sign Up</a>
+            </div>
+        </div>
+    }
+
+    <div class="region-chips" id="region-chips"></div>
+
+    <!-- Slide-out Posts Panel -->
+    <div class="posts-panel" id="posts-panel">
+        <div class="posts-panel-header">
+            <div>
+                <h4>
+                    <i class="bi bi-geo-alt-fill" style="color: var(--primary-yellow);"></i>
+                    <span id="panel-region-name">Region</span>
+                </h4>
+                <div class="posts-panel-subtitle" id="panel-post-count">0 posts</div>
+            </div>
+            <button class="posts-panel-close" id="close-panel" title="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="posts-panel-body" id="posts-list"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- MapLibre GL JS — free, open-source, no token -->
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ===== MAP SETUP (free tiles, no API key) =====
+        const map = new maplibregl.Map({
+            container: 'philippine-map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [122.5, 12.5],
+            zoom: 5.8,
+            pitch: 55,
+            bearing: -10,
+            antialias: true,
+            attributionControl: false
+        });
+
+        map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+        map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
+
+        // ===== LOCATIONS =====
+        const locations = [
+            { name: 'Metro Manila', lat: 14.5995, lng: 120.9842, zoom: 12, icon: 'bi-buildings' },
+            { name: 'Baguio', lat: 16.4023, lng: 120.5960, zoom: 13, icon: 'bi-tree' },
+            { name: 'Vigan', lat: 17.5747, lng: 120.3869, zoom: 13, icon: 'bi-bank' },
+            { name: 'Banaue', lat: 16.9120, lng: 121.0600, zoom: 13, icon: 'bi-tsunami' },
+            { name: 'Subic', lat: 14.7944, lng: 120.2822, zoom: 12, icon: 'bi-water' },
+            { name: 'Tagaytay', lat: 14.1153, lng: 120.9621, zoom: 13, icon: 'bi-cloud-fog2' },
+            { name: 'Bicol', lat: 13.1391, lng: 123.7438, zoom: 11, icon: 'bi-fire' },
+            { name: 'Boracay', lat: 11.9674, lng: 121.9248, zoom: 14, icon: 'bi-umbrella' },
+            { name: 'Cebu', lat: 10.3157, lng: 123.8854, zoom: 12, icon: 'bi-shop' },
+            { name: 'Bohol', lat: 9.8500, lng: 124.0000, zoom: 11, icon: 'bi-binoculars' },
+            { name: 'Siargao', lat: 9.8500, lng: 126.0500, zoom: 12, icon: 'bi-tsunami' },
+            { name: 'Palawan', lat: 10.2, lng: 118.9, zoom: 10, icon: 'bi-gem' },
+            { name: 'El Nido', lat: 11.1784, lng: 119.3930, zoom: 13, icon: 'bi-water' },
+            { name: 'Coron', lat: 11.9986, lng: 120.2043, zoom: 13, icon: 'bi-life-preserver' },
+            { name: 'Davao', lat: 7.1907, lng: 125.4553, zoom: 12, icon: 'bi-fruit' },
+            { name: 'Camiguin', lat: 9.1732, lng: 124.7291, zoom: 12, icon: 'bi-volcano' },
+            { name: 'Batanes', lat: 20.4487, lng: 121.9702, zoom: 11, icon: 'bi-wind' },
+            { name: 'Sagada', lat: 17.0842, lng: 121.0062, zoom: 13, icon: 'bi-cloud-fog2' },
+            { name: 'Iloilo', lat: 10.7202, lng: 122.5621, zoom: 12, icon: 'bi-egg-fried' },
+            { name: 'Zamboanga', lat: 6.9214, lng: 122.0790, zoom: 12, icon: 'bi-flower1' }
+        ];
+
+        // ===== SAMPLE POSTS =====
+        const samplePosts = {
+            'Metro Manila': [
+                { user: 'Jenny Lim', initials: 'JL', location: 'BGC, Taguig', content: 'Rooftop vibes in BGC! The skyline at sunset hits different when you\'re 30 floors up. City living at its finest.', time: '15 min ago', likes: 42, comments: 8, image: 'https://images.unsplash.com/photo-1573832035811-c0fab5fb2bba?w=400&h=200&fit=crop' },
+                { user: 'Mark Rivera', initials: 'MR', location: 'Intramuros', content: 'Walking through 400 years of history. Fort Santiago never gets old. If these walls could talk...', time: '2 hrs ago', likes: 28, comments: 5, image: 'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=400&h=200&fit=crop' },
+                { user: 'Grace Flores', initials: 'GF', location: 'Makati', content: 'Late night street food crawl in Poblacion. Php 200 for a full meal? Only in Manila!', time: '7 hrs ago', likes: 55, comments: 12, image: '' }
+            ],
+            'Baguio': [
+                { user: 'Juan Cruz', initials: 'JC', location: 'Burnham Park', content: 'Perfect 18\u00b0C morning, strawberry taho in hand, overlooking Burnham Park. This is why I keep coming back.', time: '1 hr ago', likes: 67, comments: 14, image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=400&h=200&fit=crop' },
+                { user: 'Mica Reyes', initials: 'MiR', location: 'Session Road', content: 'Ukay-ukay finds today were insane! Got a vintage denim jacket for 150 pesos. Baguio thrift game is unmatched.', time: '5 hrs ago', likes: 33, comments: 7, image: '' }
+            ],
+            'Vigan': [
+                { user: 'Pedro Santos', initials: 'PS', location: 'Calle Crisologo', content: 'Walking these cobblestone streets feels like time travel. The Spanish colonial architecture here is preserved beautifully.', time: '3 hrs ago', likes: 45, comments: 6, image: 'https://images.unsplash.com/photo-1578469550956-0e16b69c6a3d?w=400&h=200&fit=crop' }
+            ],
+            'Banaue': [
+                { user: 'Lito Aguilar', initials: 'LA', location: 'Rice Terraces', content: 'Standing at the 8th Wonder of the World. 2,000-year-old rice terraces carved by our ancestors. Pure Filipino pride.', time: '4 hrs ago', likes: 120, comments: 23, image: 'https://images.unsplash.com/photo-1568214379698-e6668d9be0fa?w=400&h=200&fit=crop' }
+            ],
+            'Subic': [
+                { user: 'Tina Gomez', initials: 'TG', location: 'Subic Bay', content: 'Jet skiing across Subic Bay, then fresh seafood for lunch. Weekend well spent!', time: '6 hrs ago', likes: 22, comments: 4, image: '' }
+            ],
+            'Tagaytay': [
+                { user: 'Carlo Dizon', initials: 'CD', location: 'Sky Ranch', content: 'Bulalo + Taal Volcano view = perfect combo. Tagaytay will always be that quick escape from Manila heat.', time: '2 hrs ago', likes: 38, comments: 9, image: 'https://images.unsplash.com/photo-1610025763872-37b1eab47de3?w=400&h=200&fit=crop' }
+            ],
+            'Bicol': [
+                { user: 'Luis Garcia', initials: 'LG', location: 'Legazpi City', content: 'Mayon Volcano at golden hour. Nature\'s perfect cone is showing off today. Also tried the spiciest Bicol Express ever!', time: '3 hrs ago', likes: 89, comments: 18, image: 'https://images.unsplash.com/photo-1628413900967-1e09fb86a498?w=400&h=200&fit=crop' }
+            ],
+            'Boracay': [
+                { user: 'Carlos Mendoza', initials: 'CM', location: 'White Beach', content: 'Station 1 at sunrise. No filter needed when the sand is THIS white and the water is THIS clear. Paradise is real.', time: '1 hr ago', likes: 156, comments: 31, image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=200&fit=crop' },
+                { user: 'Nina Reyes', initials: 'NR', location: 'D\'Mall', content: 'Island hopping day! Swam in crystal caves and had the freshest calamansi juice on a floating bar. Living my best life.', time: '5 hrs ago', likes: 73, comments: 15, image: '' }
+            ],
+            'Cebu': [
+                { user: 'Ana Garcia', initials: 'AG', location: 'Cebu City', content: 'Had the BEST lechon at Zubuchon. Crispy skin, juicy meat. Sorry Manila, Cebu wins this round.', time: '1 hr ago', likes: 91, comments: 22, image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=200&fit=crop' },
+                { user: 'Rico Tan', initials: 'RT', location: 'Moalboal', content: 'Just swam with MILLIONS of sardines! The sardine run in Moalboal is surreal. Bucket list: checked.', time: '4 hrs ago', likes: 64, comments: 11, image: '' }
+            ],
+            'Bohol': [
+                { user: 'Lisa Tan', initials: 'LT', location: 'Chocolate Hills', content: 'Standing on top of the Chocolate Hills during sunset. 1,268 perfectly shaped hills turning golden. Bohol magic.', time: '6 hrs ago', likes: 78, comments: 16, image: 'https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?w=400&h=200&fit=crop' },
+                { user: 'Ben Aquino', initials: 'BA', location: 'Tarsier Sanctuary', content: 'Met the world\'s smallest primate! Those big eyes are everything. Please visit responsibly, folks.', time: '8 hrs ago', likes: 52, comments: 9, image: '' }
+            ],
+            'Siargao': [
+                { user: 'Sofia Diaz', initials: 'SD', location: 'Cloud 9', content: 'Caught my first barrel at Cloud 9! The surfing capital lives up to the hype. Stoked beyond words.', time: '2 hrs ago', likes: 103, comments: 19, image: 'https://images.unsplash.com/photo-1502680390548-bdbac40a5e46?w=400&h=200&fit=crop' },
+                { user: 'Jake Torres', initials: 'JT', location: 'Sugba Lagoon', content: 'Paddleboarding in Sugba Lagoon. The water is so clear you can see 20 feet down. Siargao is unreal.', time: '7 hrs ago', likes: 47, comments: 8, image: '' }
+            ],
+            'Palawan': [
+                { user: 'Sarah Lee', initials: 'SL', location: 'Puerto Princesa', content: 'Underground River tour was mind-blowing. 8.2km of limestone caves, stalactites, and an actual cathedral chamber.', time: '3 hrs ago', likes: 85, comments: 14, image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&h=200&fit=crop' }
+            ],
+            'El Nido': [
+                { user: 'Mia Santos', initials: 'MS', location: 'Big Lagoon', content: 'Kayaking through the Big Lagoon. Turquoise water, towering limestone cliffs. El Nido is the crown jewel of Palawan.', time: '4 hrs ago', likes: 134, comments: 27, image: 'https://images.unsplash.com/photo-1501179691284-004a50a6010e?w=400&h=200&fit=crop' }
+            ],
+            'Coron': [
+                { user: 'Dan Villanueva', initials: 'DV', location: 'Kayangan Lake', content: 'Dove into the clearest lake in Asia. The underwater visibility is unbelievable. Coron is a diver\'s paradise.', time: '5 hrs ago', likes: 97, comments: 20, image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=200&fit=crop' }
+            ],
+            'Davao': [
+                { user: 'Ramon Cruz', initials: 'RC', location: 'Davao City', content: 'Durian ice cream at Magsaysay Park. If you haven\'t tried the king of fruits in Davao, you haven\'t lived!', time: '30 min ago', likes: 41, comments: 7, image: '' },
+                { user: 'Joy Dela Cruz', initials: 'JD', location: 'Mt. Apo', content: 'Conquered the highest peak in the Philippines! 2,954 meters of pain, but the view from the top? Worth every step.', time: '1 day ago', likes: 189, comments: 34, image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&h=200&fit=crop' }
+            ],
+            'Camiguin': [
+                { user: 'Ella Ramos', initials: 'ER', location: 'White Island', content: 'A sandbar in the middle of the sea with a volcano backdrop. Camiguin is the island born of fire and it shows.', time: '8 hrs ago', likes: 56, comments: 10, image: '' }
+            ],
+            'Batanes': [
+                { user: 'Marco Lim', initials: 'ML', location: 'Batan Island', content: 'Rolling green hills, stone houses, and zero traffic. Batanes feels like a different country. The Honesty Coffee Shop is real!', time: '1 day ago', likes: 142, comments: 28, image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop' }
+            ],
+            'Sagada': [
+                { user: 'Kris Navarro', initials: 'KN', location: 'Sumaguing Cave', content: 'Spelunking through Sumaguing Cave then watching the sea of clouds at Kiltepan. Sagada is for the soul.', time: '12 hrs ago', likes: 68, comments: 13, image: 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=400&h=200&fit=crop' }
+            ],
+            'Iloilo': [
+                { user: 'Trish Yulo', initials: 'TY', location: 'La Paz Market', content: 'Original La Paz Batchoy at the source! The rich broth, noodles, and chicharron... Iloilo food scene is slept on.', time: '6 hrs ago', likes: 49, comments: 11, image: '' }
+            ],
+            'Zamboanga': [
+                { user: 'Ali Hassan', initials: 'AH', location: 'Great Santa Cruz Island', content: 'Pink sand beach! Yes, PINK. The crushed red organ pipe coral makes the sand blush. Zamboanga\'s best kept secret.', time: '10 hrs ago', likes: 77, comments: 15, image: '' }
+            ]
+        };
+
+        // ===== BUILD REGION CHIPS =====
+        const chipsContainer = document.getElementById('region-chips');
+        const featured = ['Boracay', 'El Nido', 'Siargao', 'Baguio', 'Cebu', 'Palawan', 'Batanes', 'Bohol'];
+        featured.forEach(name => {
+            const loc = locations.find(l => l.name === name);
+            if (!loc) return;
+            const chip = document.createElement('span');
+            chip.className = 'region-chip';
+            chip.textContent = name;
+            chip.addEventListener('click', () => flyToLocation(loc));
+            chipsContainer.appendChild(chip);
+        });
+
+        // ===== MAP LOAD — add markers =====
+        map.on('load', function () {
+            locations.forEach(loc => {
+                const el = document.createElement('div');
+                el.className = 'map-pin';
+                el.innerHTML = `
+                    <div class="map-pin-pulse"></div>
+                    <div class="map-pin-inner">
+                        <i class="bi ${loc.icon}"></i>
+                    </div>
+                `;
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    flyToLocation(loc);
+                });
+
+                new maplibregl.Marker({ element: el, anchor: 'bottom' })
+                    .setLngLat([loc.lng, loc.lat])
+                    .addTo(map);
+            });
+        });
+
+        // Close panel on map click (not marker)
+        map.on('click', (e) => {
+            if (!e.originalEvent.defaultPrevented) closePanel();
+        });
+
+        // ===== FLY TO LOCATION =====
+        function flyToLocation(loc) {
+            map.flyTo({
+                center: [loc.lng, loc.lat],
+                zoom: loc.zoom,
+                pitch: 60,
+                bearing: Math.random() * 40 - 20,
+                duration: 2500,
+                essential: true
+            });
+
+            document.querySelectorAll('.region-chip').forEach(c => c.classList.remove('active'));
+            const activeChip = [...document.querySelectorAll('.region-chip')].find(c => c.textContent === loc.name);
+            if (activeChip) activeChip.classList.add('active');
+
+            showPosts(loc.name);
+        }
+
+        // ===== POSTS PANEL =====
+        const panel = document.getElementById('posts-panel');
+        const postsList = document.getElementById('posts-list');
+        const panelName = document.getElementById('panel-region-name');
+        const panelCount = document.getElementById('panel-post-count');
+
+        function showPosts(regionName) {
+            const posts = samplePosts[regionName] || [];
+            panelName.textContent = regionName;
+            panelCount.textContent = `${posts.length} post${posts.length !== 1 ? 's' : ''} from travelers`;
+
+            if (posts.length === 0) {
+                postsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-camera"></i>
+                        <p>No one has flexed about ${regionName} yet.<br>Be the first!</p>
+                    </div>`;
+            } else {
+                postsList.innerHTML = posts.map(post => {
+                    const imageBlock = post.image
+                        ? `<div class="flex-card-image" style="background-image: url('${post.image}')">
+                               <div class="flex-card-image-overlay">
+                                   <span class="badge"><i class="bi bi-geo-alt-fill me-1"></i>${post.location}</span>
+                               </div>
+                           </div>`
+                        : '';
+                    const locationInline = !post.image
+                        ? `<span style="color: var(--primary-yellow); font-size: 0.75rem;"><i class="bi bi-geo-alt-fill"></i> ${post.location}</span>`
+                        : '';
+
+                    return `
+                        <div class="flex-card">
+                            ${imageBlock}
+                            <div class="flex-card-body">
+                                <div class="flex-card-user">
+                                    <div class="flex-card-avatar">${post.initials}</div>
+                                    <div>
+                                        <div class="flex-card-name">${post.user}</div>
+                                        <div class="flex-card-time">${post.time} ${locationInline}</div>
+                                    </div>
+                                </div>
+                                <div class="flex-card-content">${post.content}</div>
+                                <div class="flex-card-actions">
+                                    <button class="flex-card-action"><i class="bi bi-heart"></i> <span class="count">${post.likes}</span></button>
+                                    <button class="flex-card-action"><i class="bi bi-chat"></i> <span class="count">${post.comments}</span></button>
+                                    <button class="flex-card-action"><i class="bi bi-share"></i></button>
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+
+            panel.classList.add('open');
+        }
+
+        function closePanel() {
+            panel.classList.remove('open');
+            document.querySelectorAll('.region-chip').forEach(c => c.classList.remove('active'));
+        }
+
+        document.getElementById('close-panel').addEventListener('click', (e) => {
+            e.stopPropagation();
+            closePanel();
+            map.flyTo({ center: [122.5, 12.5], zoom: 5.8, pitch: 55, bearing: -10, duration: 2000 });
+        });
+    });
+    </script>
+}
