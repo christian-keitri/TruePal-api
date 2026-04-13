@@ -14,9 +14,12 @@ dotnet run
 
 ## 📚 Documentation
 
+### 🚀 For Developers (Start Here)
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ **NEW DEVELOPERS START HERE** - Development workflow and guidelines
+- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - 30 mandatory coding rules
+
 ### Getting Started
 - **[QUICKSTART.md](QUICKSTART.md)** - Run the app and test API endpoints
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - Mandatory coding patterns and rules
 - **[THEME_GUIDE.md](THEME_GUIDE.md)** - CSS variables and design system
 
 ### Architecture Guides

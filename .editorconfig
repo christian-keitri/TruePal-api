@@ -1,0 +1,94 @@
+# .editorconfig - Code Style Rules
+# https://editorconfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Code files
+[*.{cs,csx,cshtml,razor}]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+
+# C# files
+[*.cs]
+# Naming conventions (enforce PascalCase, _camelCase for private fields)
+dotnet_naming_rule.private_fields_start_with_underscore.severity = warning
+dotnet_naming_rule.private_fields_start_with_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_start_with_underscore.style = underscore_camel_case
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+
+# Interfaces must start with I
+dotnet_naming_rule.interfaces_start_with_i.severity = warning
+dotnet_naming_rule.interfaces_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_start_with_i.style = i_prefix_pascal_case
+
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.i_prefix_pascal_case.capitalization = pascal_case
+dotnet_naming_style.i_prefix_pascal_case.required_prefix = I
+
+# Async methods must end with Async
+dotnet_naming_rule.async_methods_end_with_async.severity = warning
+dotnet_naming_rule.async_methods_end_with_async.symbols = async_methods
+dotnet_naming_rule.async_methods_end_with_async.style = async_suffix_pascal_case
+
+dotnet_naming_symbols.async_methods.applicable_kinds = method
+dotnet_naming_symbols.async_methods.required_modifiers = async
+
+dotnet_naming_style.async_suffix_pascal_case.capitalization = pascal_case
+dotnet_naming_style.async_suffix_pascal_case.required_suffix = Async
+
+# Code style
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_namespace_declarations = file_scoped:warning
+
+# Formatting
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Organization
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace:warning
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Config files
+[*.{yml,yaml,config}]
+indent_style = space
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# HTML/Razor
+[*.{cshtml,html}]
+indent_style = space
+indent_size = 4
+
+# CSS
+[*.css]
+indent_style = space
+indent_size = 4
+
+# JavaScript
+[*.js]
+indent_style = space
+indent_size = 2
