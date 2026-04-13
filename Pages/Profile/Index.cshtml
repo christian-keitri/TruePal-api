@@ -1,0 +1,55 @@
+@page
+@model ProfileIndexModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 6rem; color: var(--primary-yellow);"></i>
+                        </div>
+                        <h2 class="mb-1">@Model.Username</h2>
+                        <p class="text-muted">@Model.Email</p>
+                    </div>
+
+                    <hr>
+
+                    <div class="profile-info">
+                        <h4 class="mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Account Information</h4>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Username:</div>
+                            <div class="col-sm-8">@Model.Username</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Email:</div>
+                            <div class="col-sm-8">@Model.Email</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 fw-bold">Member Since:</div>
+                            <div class="col-sm-8">@Model.CreatedAt.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex gap-3 justify-content-center mt-4">
+                        <a href="#" class="btn btn-primary">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                        </a>
+                        <a href="#" class="btn btn-outline-primary">
+                            <i class="bi bi-shield-lock me-2"></i>Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
