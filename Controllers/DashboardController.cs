@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TruePal.Api.Controllers.Base;
 using TruePal.Api.Core.Interfaces;
@@ -22,9 +23,30 @@ public class DashboardController : BaseController
             return RedirectToActionWithError("Login", "Auth", "Please login to access the dashboard");
         }
 
-        // TODO: Get username from JWT token
-        ViewData["Username"] = "User";
+        // TODO: Get username from JWT token and load actual dashboard data
+        var model = new DashboardViewModel
+        {
+            Username = "User",
+            TotalPosts = 0,
+            TotalFriends = 0
+        };
 
-        return View();
+        return View(model);
     }
 }
+
+#region ViewModels
+
+public class DashboardViewModel
+{
+    [Display(Name = "Username")]
+    public string Username { get; set; } = string.Empty;
+
+    [Display(Name = "Total Posts")]
+    public int TotalPosts { get; set; }
+
+    [Display(Name = "Total Friends")]
+    public int TotalFriends { get; set; }
+}
+
+#endregion

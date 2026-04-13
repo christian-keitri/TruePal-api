@@ -1,6 +1,6 @@
+@model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
-    var username = ViewData["Username"] as string ?? "User";
 }
 
 <div class="container mt-5">
@@ -14,7 +14,7 @@
                     
                     <div class="alert alert-success">
                         <i class="bi bi-check-circle me-2"></i>
-                        Welcome back, <strong>@username</strong>!
+                        Welcome back, <strong>@Model.Username</strong>!
                     </div>
 
                     <div class="row mt-4">

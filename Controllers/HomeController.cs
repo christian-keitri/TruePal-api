@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using TruePal.Api.Controllers.Base;
 
@@ -11,8 +12,11 @@ public class HomeController : BaseController
 
     public IActionResult Index()
     {
-        ViewData["IsAuthenticated"] = Request.Cookies.ContainsKey("AuthToken");
-        return View();
+        var model = new HomeViewModel
+        {
+            IsAuthenticated = Request.Cookies.ContainsKey("AuthToken")
+        };
+        return View(model);
     }
 
     public IActionResult Error()
@@ -20,3 +24,12 @@ public class HomeController : BaseController
         return View();
     }
 }
+
+#region ViewModels
+
+public class HomeViewModel
+{
+    public bool IsAuthenticated { get; set; }
+}
+
+#endregion

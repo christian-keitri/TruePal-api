@@ -1,7 +1,7 @@
+@model HomeViewModel
 @{
     ViewData["Title"] = "Home";
     ViewData["MainClass"] = "home-page";
-    var isAuthenticated = (bool)(ViewData["IsAuthenticated"] ?? false);
 }
 
 @section Styles {
@@ -20,7 +20,7 @@
 
     <partial name="Components/_MapOverlay" />
 
-    @if (!isAuthenticated)
+    @if (!Model.IsAuthenticated)
     {
         <partial name="Components/_AuthOverlay" />
     }
