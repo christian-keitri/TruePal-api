@@ -17,7 +17,7 @@ TruePal.Api/
 │       ├── home.css                   # Home page styles (map, pins)
 │       └── dashboard.css              # Dashboard page styles (future)
 │
-└── Pages/
+└── Views/
     └── Shared/
         └── Components/                 # Reusable HTML partials
             ├── _AuthOverlay.cshtml    # Auth call-to-action overlay
@@ -75,11 +75,11 @@ TruePal.Api/
 ### Using HTML Partials
 
 ```cshtml
-<!-- Simple partial -->
-<partial name="Shared/Components/_AuthOverlay" />
+<!-- Simple partial (MVC automatically searches Shared folder) -->
+<partial name="Components/_AuthOverlay" />
 
 <!-- Partial with model (future) -->
-<partial name="Shared/Components/_PostCard" model="@postData" />
+<partial name="Components/_PostCard" model="@postData" />
 ```
 
 ## Best Practices

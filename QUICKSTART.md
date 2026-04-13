@@ -23,8 +23,10 @@ dotnet run
 
 Then open your browser to:
 - **Home Page**: http://localhost:5000/
-- **Login**: http://localhost:5000/Login
-- **Register**: http://localhost:5000/Register
+- **Login**: http://localhost:5000/Auth/Login
+- **Register**: http://localhost:5000/Auth/Register
+- **Dashboard**: http://localhost:5000/Dashboard/Index
+- **Profile**: http://localhost:5000/Profile/Index
 - **API Docs**: http://localhost:5000/openapi (in development mode)
 
 ## 📝 Test the API
@@ -83,7 +85,7 @@ Your app now has these layers:
 
 ```
 ┌─────────────────────────────────────┐
-│     Controllers & Razor Pages       │ ← Presentation Layer
+│   MVC Controllers & Views           │ ← Presentation Layer
 ├─────────────────────────────────────┤
 │    Services (IAuthService)          │ ← Business Logic Layer
 ├─────────────────────────────────────┤

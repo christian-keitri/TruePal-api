@@ -13,8 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 //
 // 1. Services (Dependency Injection)
 //
-builder.Services.AddControllers();
-builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
 
 // OpenAPI / Swagger (built-in OpenAPI in .NET 8)
 builder.Services.AddOpenApi();
@@ -68,7 +67,8 @@ app.UseAuthorization();
 //
 // 3. Route mapping
 //
-app.MapControllers();
-app.MapRazorPages();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,45 +1,55 @@
-# Scalable Razor Pages Architecture
+# Scalable MVC Architecture
 
-## 📁 New Pages Folder Structure
+## 📁 MVC Folder Structure
 
-Your Pages folder is now organized with scalable patterns following feature-based organization:
+Your application now follows the **Model-View-Controller (MVC)** pattern with feature-based organization:
 
 ```
-Pages/
+Controllers/
 ├── Base/                          # Base classes for inheritance
-│   └── BasePageModel.cs          # Shared page model functionality
+│   └── BaseController.cs         # Shared controller functionality
 │
-├── ViewModels/                    # Data Transfer Objects for pages
-│   ├── LoginViewModel.cs         # Login form data with validation
-│   └── RegisterViewModel.cs      # Registration form data with validation
+├── AuthController.cs             # Authentication controller (Login, Register, Logout)
+├── DashboardController.cs        # Dashboard controller
+├── ProfileController.cs          # Profile controller
+├── HomeController.cs             # Home page controller
 │
-├── Auth/                          # Authentication feature folder
-│   ├── Login.cshtml              # Login page view
-│   ├── Login.cshtml.cs           # Login page logic
-│   ├── Register.cshtml           # Registration page view
-│   ├── Register.cshtml.cs        # Registration page logic
-│   ├── ForgotPassword.cshtml     # Password reset view
-│   └── ForgotPassword.cshtml.cs  # Password reset logic
+├── ApiAuthController.cs          # REST API - Authentication
+├── ApiPostsController.cs         # REST API - Posts
+└── ApiUsersController.cs         # REST API - Users
+
+Views/
+├── Auth/                          # Authentication views
+│   ├── Login.cshtml              # Login form view
+│   ├── Register.cshtml           # Registration form view
+│   └── ForgotPassword.cshtml     # Password reset view
 │
-├── Dashboard/                     # Dashboard feature folder
-│   ├── Index.cshtml              # Dashboard view
-│   └── Index.cshtml.cs           # Dashboard logic
+├── Dashboard/                     # Dashboard views
+│   └── Index.cshtml              # Dashboard main view
+│
+├── Profile/                       # Profile views
+│   └── Index.cshtml              # Profile main view
+│
+├── Home/                          # Home views
+│   └── Index.cshtml              # Landing page with map
 │
 ├── Shared/                        # Shared layouts and components
 │   ├── _Layout.cshtml            # Main layout template
 │   ├── _StatusMessages.cshtml    # Reusable alert component
-│   └── _ValidationScriptsPartial.cshtml  # Client-side validation
+│   ├── _ValidationScriptsPartial.cshtml  # Client-side validation
+│   └── Components/               # Reusable component partials
+│       ├── _AuthOverlay.cshtml   # Auth call-to-action overlay
+│       ├── _MapOverlay.cshtml    # Map header overlay
+│       └── _PostsPanel.cshtml    # Posts slide-out panel
 │
-├── Index.cshtml                   # Home page view
-├── Index.cshtml.cs               # Home page logic
-├── _ViewImports.cshtml           # Global imports
+├── _ViewImports.cshtml           # Global imports and namespaces
 └── _ViewStart.cshtml             # Default layout configuration
 ```
 
 ## 🎯 Key Improvements
 
 ### 1. Feature-Based Organization
-**Before:**
+**Before (Razor Pages):**
 ```
 Pages/
 ├── Login.cshtml
@@ -47,13 +57,17 @@ Pages/
 ├── _Layout.cshtml
 ```
 
-**After:**
+**After (MVC):**
 ```
-Pages/
-├── Auth/           # All auth-related pages together
+Controllers/
+├── AuthController.cs      # All auth actions in one controller
+└── DashboardController.cs # All dashboard actions in one controller
+
+Views/
+├── Auth/           # All auth-related views together
 │   ├── Login.cshtml
 │   └── Register.cshtml
-├── Dashboard/      # All dashboard pages together
+├── Dashboard/      # All dashboard views together
 └── Shared/         # Shared components
 ```
 
@@ -61,67 +75,62 @@ Pages/
 - Related features grouped together
 - Easy to find and maintain
 - Scales as you add more features
-- Clear ownership boundaries
+- Clear controller responsibilities
+- Testable controller actions
 
 ### 2. ViewModels with Data Annotations
 
-**Before:**
+ViewModels are defined within the controller file for easy access:
+
 ```csharp
-[BindProperty]
-public string Email { get; set; } = string.Empty;
-
-[BindProperty]
-public string Password { get; set; } = string.Empty;
-```
-
-**After:**
-```csharp
-[BindProperty]
-public LoginViewModel Input { get; set; } = new();
-
-// LoginViewModel.cs
+// At bottom of AuthController.cs
 public class LoginViewModel
 {
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email format")]
+    [Display(Name = "Email Address")]
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Password is required")]
     [DataType(DataType.Password)]
+    [Display(Name = "Password")]
     public string Password { get; set; } = string.Empty;
+    
+    [Display(Name = "Remember me")]
+    public bool RememberMe { get; set; }
 }
 ```
 
 **Benefits:**
 - Centralized validation rules
-- Reusable across pages and APIs
+- Reusable across actions
 - Type-safe with IntelliSense
 - Automatic client-side validation
 - Clear data contracts
 
-### 3. Base PageModel Class
+### 3. BaseController Class
 
 **Before:**
 ```csharp
-public class LoginModel : PageModel
+public class AuthController : Controller
 {
     public string? ErrorMessage { get; set; }
     public List<string> ErrorMessages { get; set; } = new();
-    // Repeat in every page...
+    // Repeat in every controller...
 }
 ```
 
 **After:**
 ```csharp
-public class LoginModel : BasePageModel
+public class AuthController : BaseController
 {
-    public LoginModel(IAuthService authService, ILogger<LoginModel> logger) 
-        : base(logger)
+    public AuthController(IAuthService authService, IConfiguration configuration, ILogger<AuthController> logger) 
+        : base(logger, configuration)
     {
     }
     
-    // ErrorMessage, ErrorMessages, SuccessMessage, etc. inherited
-    // Helper methods available: AddError(), SetSuccess(), LogAndDisplayError()
+    // ErrorMessage, ErrorMessages, SuccessMessage, etc. inherited via TempData
+    // Helper methods available: SetError(), SetSuccess(), RedirectToActionWithSuccess()
 }
 ```
 
@@ -162,62 +171,71 @@ The new layout includes:
 
 ## 🔧 How to Use
 
-### Creating a New Feature Folder
+### Creating a New Feature
 
-Example: Adding a "Profile" feature
+Example: Adding a "Posts" feature
 
-1. **Create folder structure:**
-```
-Pages/
-└── Profile/
-    ├── Index.cshtml          # View profile
-    ├── Index.cshtml.cs       
-    ├── Edit.cshtml           # Edit profile
-    └── Edit.cshtml.cs
-```
-
-2. **Create ViewModel:**
+1. **Create controller:**
 ```csharp
-// Pages/ViewModels/ProfileViewModel.cs
-public class ProfileViewModel
+// Controllers/PostsController.cs
+namespace TruePal.Api.Controllers;
+
+public class PostsController : BaseController
 {
-    [Required]
-    [StringLength(100)]
-    public string DisplayName { get; set; } = string.Empty;
+    private readonly IPostService _postService;
 
-    [StringLength(500)]
-    public string Bio { get; set; } = string.Empty;
-}
-```
-
-3. **Create PageModel:**
-```csharp
-// Pages/Profile/Edit.cshtml.cs
-namespace TruePal.Api.Pages.Profile;
-
-public class EditModel : BasePageModel
-{
-    private readonly IProfileService _profileService;
-
-    public EditModel(IProfileService profileService, ILogger<EditModel> logger) 
-        : base(logger)
+    public PostsController(IPostService postService, IConfiguration configuration, ILogger<PostsController> logger) 
+        : base(logger, configuration)
     {
-        _profileService = profileService;
+        _postService = postService;
     }
 
-    [BindProperty]
-    public ProfileViewModel Input { get; set; } = new();
-
-    public async Task<IActionResult> OnGetAsync()
+    [HttpGet]
+    public async Task<IActionResult> Index()
     {
-        // Load profile data
-        return Page();
+        var posts = await _postService.GetAllPostsAsync();
+        return View(posts);
     }
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        if (!ModelState.IsValid)
-            return Page();
+    [HttpGet]
+    public IActionResult Create()
+### Using BaseController Helper Methods
+
+```csharp
+// Set success message (stored in TempData)
+SetSuccess("Operation completed!");
+
+// Set error message
+SetError("Something went wrong");
+
+// Set info message
+SetInfo("Please note this information");
+
+// Redirect with success message
+return RedirectToActionWithSuccess("Index", "Dashboard", "Profile saved!");
+
+// Add multiple errors to ModelState
+AddErrors(result.Errors);
+
+// Log and display error
+LogAndDisplayError("Database connection failed", exception);
+```
+
+### Creating Reusable Components
+
+```razor
+@* Views/Shared/Components/_UserCard.cshtml *@
+@model User
+
+<div class="card">
+    <div class="card-body">
+        <h5>@Model.Username</h5>
+        <p>@Model.Email</p>
+    </div>
+</div>
+
+@* Usage in any view: *@
+<partial name="Components/urn Page();
 
         var result = await _profileService.UpdateProfileAsync(Input);
         

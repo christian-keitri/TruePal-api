@@ -1,14 +1,14 @@
-# Scalable Architecture - Implementation Summary
+# Scalable MVC Architecture - Implementation Summary
 
 ## ✅ What Was Done
 
-Your TruePal.Api has been completely restructured with enterprise-grade, scalable architecture patterns. Here's what changed:
+Your TruePal.Api has been completely restructured with enterprise-grade, scalable **MVC architecture**. Here's what changed:
 
 ## 🏗️ New Folder Structure
 
 ```
 TruePal.Api/
-├── Core/                          # ✨ NEW - Domain layer
+├── Core/                          # ✨ Domain layer
 │   ├── Common/
 │   │   └── Result.cs             # Result pattern for error handling
 │   ├── Configuration/
@@ -21,11 +21,11 @@ TruePal.Api/
 │   └── Validators/
 │       └── ValidationHelper.cs   # Input validation logic
 │
-├── Application/                   # ✨ NEW - Application layer
+├── Application/                   # ✨ Application layer
 │   └── Services/
-│       └── AuthService.cs        # NEW implementation with Result pattern
+│       └── AuthService.cs        # Implementation with Result pattern
 │
-├── Infrastructure/                # ✨ NEW - Infrastructure layer
+├── Infrastructure/                # ✨ Infrastructure layer
 │   ├── Middleware/
 │   │   ├── GlobalExceptionMiddleware.cs  # Global error handling
 │   │   └── RequestLoggingMiddleware.cs   # Request/response logging
@@ -34,14 +34,38 @@ TruePal.Api/
 │   │   └── UserRepository.cs     # User repository implementation
 │   └── UnitOfWork.cs             # Coordinates repositories
 │
-├── Controllers/                   # ✅ UPDATED
-│   └── AuthController.cs         # Now uses IAuthService & Result pattern
+├── Controllers/                   # ✅ MVC Controllers
+│   ├── Base/
+│   │   └── BaseController.cs     # ✨ NEW - Shared controller functionality
+│   ├── AuthController.cs         # ✅ MVC - Login, Register, Logout
+│   ├── DashboardController.cs    # ✅ MVC - Dashboard
+│   ├── ProfileController.cs      # ✅ MVC - Profile
+│   ├── HomeController.cs         # ✅ MVC - Home page
+│   ├── ApiAuthController.cs      # ✅ RENAMED - REST API for auth
+│   ├── ApiPostsController.cs     # REST API for posts
+│   └── ApiUsersController.cs     # REST API for users
 │
-├── Pages/                         # ✅ UPDATED
-│   ├── Login.cshtml.cs           # Uses IAuthService interface
-│   └── Register.cshtml.cs        # Uses IAuthService interface
+├── Views/                         # ✨ MVC Views (converted from Pages/)
+│   ├── Auth/
+│   │   ├── Login.cshtml          # ✅ CONVERTED to MVC syntax
+│   │   ├── Register.cshtml       # ✅ CONVERTED to MVC syntax
+│   │   └── ForgotPassword.cshtml # ✅ CONVERTED to MVC syntax
+│   ├── Dashboard/
+│   │   └── Index.cshtml          # ✅ CONVERTED
+│   ├── Profile/
+│   │   └── Index.cshtml          # ✅ CONVERTED
+│   ├── Home/
+│   │   └── Index.cshtml          # ✅ CONVERTED
+│   ├── Shared/
+│   │   ├── _Layout.cshtml        # ✅ UPDATED - MVC routing
+│   │   ├── _StatusMessages.cshtml
+│   │   ├── _ValidationScriptsPartial.cshtml
+│   │   └── Components/           # Reusable partials
+│   ├── _ViewImports.cshtml       # ✅ UPDATED
+│   └── _ViewStart.cshtml         # ✅ UPDATED
 │
-└── Services/                      # ❌ DELETED - Moved to Application/
+└── Pages/                         # ❌ DEPRECATED - Moved to Views/
+    └── Base/                      # Kept for legacy compatibility
 ```
 
 ## 🎯 Design Patterns Implemented
@@ -251,3 +275,46 @@ public async Task Register_WithExistingEmail_ReturnsFailure()
 7. **Add Integration Tests** - Test full workflows
 
 Your application now follows SOLID principles and is ready to scale! 🎉
+
+## 🔄 Latest Update: MVC Migration
+
+### What Changed (April 2026)
+The application was migrated from **Razor Pages** to **MVC (Model-View-Controller)** pattern.
+
+### Why MVC?
+- ✅ Better separation of concerns (Controller vs View)
+- ✅ More testable - controllers are pure classes
+- ✅ Industry standard for web applications
+- ✅ Coexists well with REST API controllers
+- ✅ More flexible routing patterns
+
+### Migration Summary
+```
+Razor Pages (Before)          →    MVC (After)
+─────────────────────────────────────────────────────────
+Pages/Auth/Login.cshtml.cs    →    Controllers/AuthController.cs
+@page directive               →    @model ViewModel
+asp-page="/Auth/Login"        →    asp-controller="Auth" asp-action="Login"
+OnPostAsync()                 →    [HttpPost] Login(LoginViewModel model)
+```
+
+### New Routing
+- **Home**: `/` → `HomeController.Index()`
+- **Login**: `/Auth/Login` → `AuthController.Login()`
+- **Register**: `/Auth/Register` → `AuthController.Register()`
+- **Dashboard**: `/Dashboard/Index` → `DashboardController.Index()`
+- **Profile**: `/Profile/Index` → `ProfileController.Index()`
+
+### ViewModels
+ViewModels are now defined at the bottom of controller files for better organization:
+```csharp
+// Controllers/AuthController.cs
+public class AuthController : BaseController { ... }
+
+#region ViewModels
+public class LoginViewModel { ... }
+public class RegisterViewModel { ... }
+#endregion
+```
+
+See [MVC_MIGRATION.md](MVC_MIGRATION.md) for complete migration details.

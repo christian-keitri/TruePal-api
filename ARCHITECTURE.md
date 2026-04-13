@@ -24,8 +24,19 @@ TruePal.Api/
 ├── Data/                     # Database context
 ├── Models/                   # Domain entities
 ├── DTOs/                     # Data transfer objects
-├── Controllers/              # API endpoints
-└── Pages/                    # Razor Pages UI
+├── Controllers/              # MVC Controllers & API Controllers
+│   ├── Base/                 # BaseController for shared functionality
+│   ├── AuthController.cs     # MVC Auth controller
+│   ├── DashboardController.cs # MVC Dashboard controller
+│   ├── ProfileController.cs  # MVC Profile controller
+│   ├── HomeController.cs     # MVC Home controller
+│   └── Api*.cs               # REST API controllers
+└── Views/                    # MVC Views (Razor syntax)
+    ├── Auth/                 # Authentication views
+    ├── Dashboard/            # Dashboard views
+    ├── Profile/              # Profile views
+    ├── Home/                 # Home views
+    └── Shared/               # Shared layouts & components
 ```
 
 ## 🔑 Key Design Patterns
@@ -66,12 +77,12 @@ Global concerns handled consistently
 ## 📊 Data Flow
 
 ```
-Request → Controller/Page 
+Request → Controller (MVC)
     → Service (IAuthService)
         → Repository (IUserRepository via UnitOfWork)
             → Database
         ← Result<T>
-    ← Response
+    ← View/JSON Response
 ```
 
 ## 🔐 Authentication Flow
@@ -126,10 +137,15 @@ public interface IPostService {
     Task<Result<Post>> CreatePostAsync(...);
 }
 
-// 6. Use in controller
-public class PostsController {
+// 6. Use in MVC controller
+public class PostsController : BaseController {
     private readonly IPostService _postService;
-    ...
+    
+    [HttpGet]
+    public async Task<IActionResult> Index() {
+        var posts = await _postService.GetAllPostsAsync();
+        return View(posts);
+    }
 }
 ```
 

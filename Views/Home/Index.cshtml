@@ -1,9 +1,7 @@
-@page
-@model IndexModel
 @{
     ViewData["Title"] = "Home";
     ViewData["MainClass"] = "home-page";
-    Layout = "_Layout";
+    var isAuthenticated = (bool)(ViewData["IsAuthenticated"] ?? false);
 }
 
 @section Styles {
@@ -20,16 +18,16 @@
 <div class="map-hero">
     <div id="philippine-map"></div>
 
-    <partial name="Shared/Components/_MapOverlay" />
+    <partial name="Components/_MapOverlay" />
 
-    @if (!Model.IsAuthenticated)
+    @if (!isAuthenticated)
     {
-        <partial name="Shared/Components/_AuthOverlay" />
+        <partial name="Components/_AuthOverlay" />
     }
 
     <div class="region-chips" id="region-chips"></div>
 
-    <partial name="Shared/Components/_PostsPanel" />
+    <partial name="Components/_PostsPanel" />
 </div>
 
 @section Scripts {
