@@ -15,19 +15,53 @@
     <link rel="stylesheet" href="~/css/pages/home.css" asp-append-version="true">
 }
 
-<div class="map-hero">
-    <div id="philippine-map"></div>
-
-    <partial name="Components/_MapOverlay" />
-
-    @if (!Model.IsAuthenticated)
-    {
-        <partial name="Components/_AuthOverlay" />
-    }
-
-    <div class="region-chips" id="region-chips"></div>
-
-    <partial name="Components/_PostsPanel" />
+<div class="split-layout">
+    <!-- Left Half: Map -->
+    <div class="map-section">
+        <div id="philippine-map"></div>
+        
+        <partial name="Components/_MapOverlay" />
+        
+        @if (!Model.IsAuthenticated)
+        {
+            <partial name="Components/_AuthOverlay" />
+        }
+        
+        <div class="region-chips" id="region-chips"></div>
+    </div>
+    
+    <!-- Right Half: Details -->
+    <div class="details-section">
+        <div class="details-header">
+            <h2 id="location-title">
+                <i class="bi bi-geo-alt-fill me-2"></i>
+                Explore the Philippines
+            </h2>
+            <p class="text-muted" id="location-subtitle">Click any location on the map or chip below to see posts</p>
+        </div>
+        
+        <div class="details-content" id="posts-container">
+            <!-- Welcome message when no location selected -->
+            <div class="welcome-message" id="welcome-message">
+                <i class="bi bi-map" style="font-size: 4rem; color: var(--color-primary); margin-bottom: 1rem;"></i>
+                <h3>Discover Amazing Places</h3>
+                <p class="text-muted">Select a location from the map to see posts, photos, and stories from travelers.</p>
+                <div class="featured-locations mt-4">
+                    <h5 class="mb-3">Popular Destinations</h5>
+                    <div class="location-grid">
+                        <span class="location-badge"><i class="bi bi-umbrella"></i> Boracay</span>
+                        <span class="location-badge"><i class="bi bi-gem"></i> El Nido</span>
+                        <span class="location-badge"><i class="bi bi-tsunami"></i> Siargao</span>
+                        <span class="location-badge"><i class="bi bi-tree"></i> Baguio</span>
+                        <span class="location-badge"><i class="bi bi-shop"></i> Cebu</span>
+                        <span class="location-badge"><i class="bi bi-wind"></i> Batanes</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Posts will be dynamically loaded here -->
+        </div>
+    </div>
 </div>
 
 @section Scripts {
@@ -183,9 +217,11 @@
             });
         });
 
-        // Close panel on map click (not marker)
+        // Map click - no need to close panel since details are always visible
         map.on('click', (e) => {
-            if (!e.originalEvent.defaultPrevented) closePanel();
+            if (!e.originalEvent.defaultPrevented) {
+                // Optional: reset to default view or do nothing
+            }
         });
 
         // ===== FLY TO LOCATION =====
@@ -206,25 +242,34 @@
             showPosts(loc.name);
         }
 
-        // ===== POSTS PANEL =====
-        const panel = document.getElementById('posts-panel');
-        const postsList = document.getElementById('posts-list');
-        const panelName = document.getElementById('panel-region-name');
-        const panelCount = document.getElementById('panel-post-count');
+        // ===== SHOW POSTS IN DETAILS SECTION =====
+        const postsContainer = document.getElementById('posts-container');
+        const locationTitle = document.getElementById('location-title');
+        const locationSubtitle = document.getElementById('location-subtitle');
+        const welcomeMessage = document.getElementById('welcome-message');
 
         function showPosts(regionName) {
             const posts = samplePosts[regionName] || [];
-            panelName.textContent = regionName;
-            panelCount.textContent = `${posts.length} post${posts.length !== 1 ? 's' : ''} from travelers`;
+            const location = locations.find(l => l.name === regionName);
+            
+            // Update header
+            locationTitle.innerHTML = `<i class="bi ${location?.icon || 'bi-geo-alt-fill'} me-2"></i>${regionName}`;
+            locationSubtitle.textContent = `${posts.length} post${posts.length !== 1 ? 's' : ''} from travelers`;
+
+            // Hide welcome message
+            if (welcomeMessage) {
+                welcomeMessage.style.display = 'none';
+            }
 
             if (posts.length === 0) {
-                postsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="bi bi-camera"></i>
-                        <p>No one has flexed about ${regionName} yet.<br>Be the first!</p>
+                postsContainer.innerHTML = `
+                    <div class="welcome-message" style="display: block;">
+                        <i class="bi bi-camera" style="font-size: 4rem; color: var(--color-primary); margin-bottom: 1rem;"></i>
+                        <h3>No Posts Yet</h3>
+                        <p class="text-muted">No one has shared about ${regionName} yet.<br>Be the first to post!</p>
                     </div>`;
             } else {
-                postsList.innerHTML = posts.map(post => {
+                postsContainer.innerHTML = posts.map(post => {
                     const imageBlock = post.image
                         ? `<div class="flex-card-image" style="background-image: url('${post.image}')">
                                <div class="flex-card-image-overlay">
@@ -233,11 +278,11 @@
                            </div>`
                         : '';
                     const locationInline = !post.image
-                        ? `<span style="color: var(--color-accent); font-size: 0.75rem;"><i class="bi bi-geo-alt-fill"></i> ${post.location}</span>`
+                        ? `<span style="color: var(--color-primary); font-size: 0.75rem;"><i class="bi bi-geo-alt-fill"></i> ${post.location}</span>`
                         : '';
 
                     return `
-                        <div class="flex-card">
+                        <div class="flex-card mb-3">
                             ${imageBlock}
                             <div class="flex-card-body">
                                 <div class="flex-card-user">
@@ -257,20 +302,10 @@
                         </div>`;
                 }).join('');
             }
-
-            panel.classList.add('open');
+            
+            // Scroll to top of details content
+            postsContainer.scrollTop = 0;
         }
-
-        function closePanel() {
-            panel.classList.remove('open');
-            document.querySelectorAll('.region-chip').forEach(c => c.classList.remove('active'));
-        }
-
-        document.getElementById('close-panel').addEventListener('click', (e) => {
-            e.stopPropagation();
-            closePanel();
-            map.flyTo({ center: [122.5, 12.5], zoom: 5.8, pitch: 55, bearing: -10, duration: 2000 });
-        });
     });
     </script>
 }

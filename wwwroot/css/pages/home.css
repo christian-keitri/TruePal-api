@@ -6,17 +6,170 @@ main[role="main"].home-page {
     padding: 0 !important;
 }
 
-/* ===== HERO MAP SECTION ===== */
-.map-hero {
-    position: relative;
+/* ===== SPLIT LAYOUT (50/50) ===== */
+.split-layout {
+    display: flex;
     width: 100%;
-    height: calc(100vh - var(--navbar-height));
+    height: calc(100vh - 66px);
+    /* Adjust based on navbar height */
+    overflow: hidden;
+}
+
+/* Left Half: Map Section */
+.map-section {
+    position: relative;
+    flex: 0 0 50%;
+    height: 100%;
     overflow: hidden;
 }
 
 #philippine-map {
     width: 100%;
     height: 100%;
+}
+
+/* Right Half: Details Section */
+.details-section {
+    flex: 0 0 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    border-left: 3px solid var(--color-primary);
+}
+
+.details-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 2px solid var(--color-primary-light);
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-secondary) 100%);
+}
+
+.details-header h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+.details-header h2 i {
+    color: var(--color-primary);
+}
+
+.details-header p {
+    margin: var(--spacing-xs) 0 0 0;
+    font-size: 0.9rem;
+}
+
+.details-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+}
+
+/* Custom scrollbar for details content */
+.details-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.details-content::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+.details-content::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+}
+
+.details-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark);
+}
+
+/* Welcome Message */
+.welcome-message {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+}
+
+.welcome-message h3 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+}
+
+.location-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.location-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-primary-light);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: var(--transition-base);
+}
+
+.location-badge:hover {
+    background: var(--color-primary);
+    color: var(--color-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.location-badge i {
+    color: var(--color-primary);
+    transition: var(--transition-base);
+}
+
+.location-badge:hover i {
+    color: var(--color-dark);
+}
+
+/* Responsive: Stack vertically on mobile */
+@media (max-width: 992px) {
+    .split-layout {
+        flex-direction: column;
+    }
+
+    .map-section {
+        flex: 0 0 50%;
+    }
+
+    .details-section {
+        flex: 0 0 50%;
+        border-left: none;
+        border-top: 3px solid var(--color-primary);
+    }
+}
+
+@media (max-width: 768px) {
+    .map-section {
+        flex: 0 0 40%;
+    }
+
+    .details-section {
+        flex: 0 0 60%;
+    }
+
+    .details-header {
+        padding: var(--spacing-md);
+    }
+
+    .details-content {
+        padding: var(--spacing-md);
+    }
+
+    .location-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* ===== REGION CHIPS (bottom of map) ===== */
