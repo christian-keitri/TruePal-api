@@ -1,0 +1,41 @@
+@model DashboardViewModel
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-file-post"></i>
+        </div>
+        <div class="stat-content">
+            <h3>@Model.TotalPosts</h3>
+            <p>Your Posts</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-eye"></i>
+        </div>
+        <div class="stat-content">
+            <h3>@Model.TotalReach</h3>
+            <p>Total Reach</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-bookmark"></i>
+        </div>
+        <div class="stat-content">
+            <h3>@Model.TotalSaved</h3>
+            <p>Saved Places</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-heart-fill"></i>
+        </div>
+        <div class="stat-content">
+            <h3>@Model.TotalLikes</h3>
+            <p>Likes Received</p>
+        </div>
+    </div>
+</div>

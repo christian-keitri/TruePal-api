@@ -1,0 +1,24 @@
+@model DashboardViewModel
+
+<!-- Saved Places -->
+<div class="sidebar-widget">
+    <div class="widget-header">
+        <h3>
+            <i class="bi bi-bookmark-fill"></i>
+            Saved Places
+        </h3>
+        <a href="#" class="view-all">View All</a>
+    </div>
+    <div class="widget-content">
+        @foreach (var place in Model.SavedPlaces)
+        {
+            <div class="saved-place-item">
+                <i class="bi bi-geo-alt-fill"></i>
+                <div class="saved-place-info">
+                    <p class="saved-place-name">@place.Location</p>
+                    <small>@place.SavedBy others want to visit</small>
+                </div>
+            </div>
+        }
+    </div>
+</div>

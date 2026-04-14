@@ -1,0 +1,67 @@
+@model DashboardViewModel
+
+<!-- Left Column: Feed -->
+<div class="feed-section">
+    <div class="section-header">
+        <h2>
+            <i class="bi bi-compass"></i>
+            Discover Places
+        </h2>
+        <div class="filter-buttons">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Food</button>
+            <button class="filter-btn">Adventure</button>
+            <button class="filter-btn">Culture</button>
+            <button class="filter-btn">Nature</button>
+        </div>
+    </div>
+
+    <div class="posts-grid">
+        @foreach (var post in Model.RecentPosts)
+        {
+            <div class="post-card">
+                <div class="post-image" style="background-image: url('@post.ImageUrl');">
+                    <span class="post-category">@post.Category</span>
+                </div>
+                <div class="post-content">
+                    <div class="post-user">
+                        <div class="user-avatar">@post.UserInitials</div>
+                        <div class="user-info">
+                            <h4>@post.Username</h4>
+                            <p class="post-location">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                @post.Location
+                            </p>
+                        </div>
+                    </div>
+                    <p class="post-text">@post.Content</p>
+                    <div class="post-stats">
+                        <span>
+                            <i class="bi bi-heart"></i>
+                            @post.LikesCount
+                        </span>
+                        <span>
+                            <i class="bi bi-chat"></i>
+                            @post.CommentsCount
+                        </span>
+                        <span class="post-time">@post.TimeAgo</span>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn-action">
+                            <i class="bi bi-heart"></i>
+                            Like
+                        </button>
+                        <button class="btn-action">
+                            <i class="bi bi-chat"></i>
+                            Comment
+                        </button>
+                        <button class="btn-action">
+                            <i class="bi bi-bookmark"></i>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

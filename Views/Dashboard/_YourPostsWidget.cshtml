@@ -1,0 +1,27 @@
+@model DashboardViewModel
+
+<!-- Your Posts -->
+<div class="sidebar-widget">
+    <div class="widget-header">
+        <h3>
+            <i class="bi bi-person-circle"></i>
+            Your Posts
+        </h3>
+        <a href="#" class="view-all">View All</a>
+    </div>
+    <div class="widget-content">
+        @foreach (var post in Model.YourPosts)
+        {
+            <div class="mini-post-card">
+                <div class="mini-post-image" style="background-image: url('@post.ImageUrl');"></div>
+                <div class="mini-post-info">
+                    <p class="mini-post-location">@post.Location</p>
+                    <div class="mini-post-stats">
+                        <span><i class="bi bi-heart"></i> @post.LikesCount</span>
+                        <span><i class="bi bi-chat"></i> @post.CommentsCount</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
