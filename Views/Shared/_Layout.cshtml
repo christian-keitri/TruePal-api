@@ -40,12 +40,158 @@
             transition: var(--transition-base);
         }
 
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+        }
+
         .navbar-brand:hover {
             opacity: 0.9;
         }
 
         .navbar-nav {
             gap: var(--spacing-sm);
+        }
+
+        /* Search Bar in Navbar */
+        .navbar-search {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .navbar-search .search-input-group {
+            position: relative;
+        }
+
+        .navbar-search input {
+            background: var(--color-dark-lighter);
+            border: 1px solid var(--color-primary-border);
+            border-radius: var(--radius-pill);
+            color: var(--text-white);
+            padding: var(--spacing-sm) 2.5rem var(--spacing-sm) var(--spacing-md);
+            width: 100%;
+            transition: var(--transition-base);
+        }
+
+        .navbar-search input::placeholder {
+            color: var(--text-white-secondary);
+        }
+
+        .navbar-search input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: var(--color-dark);
+            box-shadow: 0 0 0 3px var(--color-primary-glow);
+        }
+
+        /* Search input clear button (X) styling */
+        /* Note: Data URI used for browser-native search clear button customization */
+        .navbar-search input::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c9a961'%3E%3Cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z'/%3E%3C/svg%3E");
+            background-size: 16px 16px;
+            cursor: pointer;
+            margin-right: var(--spacing-sm);
+            opacity: 0.7;
+        }
+
+        .navbar-search input::-webkit-search-cancel-button:hover {
+            opacity: 1;
+        }
+
+        .navbar-search .search-icon {
+            position: absolute;
+            right: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-primary);
+            pointer-events: none;
+        }
+
+        @@media (max-width: 1200px) {
+            .navbar-search {
+                max-width: 350px;
+            }
+        }
+
+        /* Trending Button in Navbar */
+        .trending-btn-nav {
+            background: var(--color-dark);
+            border: 2px solid var(--color-primary);
+            color: var(--text-white);
+            padding: 0;
+            border-radius: var(--radius-circle);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+        }
+
+        .trending-btn-nav i {
+            font-size: 1.1rem;
+            color: var(--color-primary);
+        }
+
+        .trending-btn-nav span {
+            color: var(--text-white);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile trending button keeps pill shape for text */
+        .d-lg-none .trending-btn-nav {
+            border-radius: var(--radius-pill);
+            padding: var(--spacing-sm) var(--spacing-md);
+            gap: var(--spacing-xs);
+            width: auto;
+            height: auto;
+        }
+
+        /* Mobile Search Styles */
+        .mobile-search-container {
+            position: relative;
+        }
+
+        .mobile-search-container input {
+            background: var(--color-dark-lighter);
+            border: 1px solid var(--color-primary-border);
+            border-radius: var(--radius-pill);
+            color: var(--text-white);
+            padding: var(--spacing-sm) 2.5rem var(--spacing-sm) var(--spacing-md);
+        }
+
+        .mobile-search-container .search-icon {
+            position: absolute;
+            right: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-primary);
+            pointer-events: none;
+        }
+
+        /* Mobile search clear button (X) styling */
+        /* Note: Data URI used for browser-native search clear button customization */
+        .mobile-search-container input::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23c9a961'%3E%3Cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z'/%3E%3C/svg%3E");
+            background-size: 16px 16px;
+            cursor: pointer;
+            margin-right: var(--spacing-sm);
+            opacity: 0.7;
+        }
+
+        .mobile-search-container input::-webkit-search-cancel-button:hover {
+            opacity: 1;
         }
 
         .nav-link {
@@ -108,12 +254,44 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                <img src="~/images/logo.png" alt="TruePal" style="height: 40px; width: auto;" />
+                <img src="~/images/logo.png" alt="TruePal" />
             </a>
+            
+            <!-- Search Bar (Center) -->
+            <div class="navbar-search d-none d-lg-flex align-items-center gap-2">
+                <div class="search-input-group flex-grow-1">
+                    <input type="search" 
+                           class="form-control" 
+                           placeholder="Search destinations, posts, people..." 
+                           aria-label="Search">
+                    <i class="bi bi-search search-icon"></i>
+                </div>
+                <button class="trending-btn-nav" id="trending-btn" title="View Trending Posts" type="button">
+                    <i class="bi bi-fire"></i>
+                </button>
+            </div>
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Mobile Search Bar -->
+                <div class="d-lg-none mb-3 mt-2">
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="mobile-search-container flex-grow-1">
+                            <input type="search" 
+                                   class="form-control" 
+                                   placeholder="Search destinations, posts, people..." 
+                                   aria-label="Search">
+                            <i class="bi bi-search search-icon"></i>
+                        </div>
+                        <button class="trending-btn-nav" title="View Trending Posts" type="button">
+                            <i class="bi bi-fire-fill"></i>
+                            <span>Trending</span>
+                        </button>
+                    </div>
+                </div>
+                
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">
