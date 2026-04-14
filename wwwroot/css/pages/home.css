@@ -414,6 +414,42 @@ main[role="main"].home-page {
     box-shadow: 0 4px 16px var(--color-primary-glow);
 }
 
+/* ===== TRENDING BUTTON (Map Section) ===== */
+.trending-btn {
+    position: absolute;
+    top: 20px;
+    right: 60px;
+    z-index: 100;
+    background: var(--color-primary);
+    border: 2px solid var(--color-primary-dark);
+    color: var(--text-white);
+    padding: 10px 18px;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.trending-btn:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--color-primary-glow);
+}
+
+.trending-btn i {
+    font-size: 1.1rem;
+    color: var(--color-accent);
+}
+
+.trending-btn:active {
+    transform: translateY(0);
+}
+
 /* ===== MODERN CIRCULAR MARKERS ===== */
 .map-marker {
     position: relative;
@@ -520,30 +556,48 @@ main[role="main"].home-page {
         font-size: 0.7rem;
         padding: 5px 10px;
     }
+
+    .trending-btn {
+        top: 12px;
+        right: 12px;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        gap: 6px;
+    }
+
+    .trending-btn span {
+        display: none;
+    }
+
+    .trending-btn i {
+        font-size: 1rem;
+    }
 }
 
 /* ===== TRENDING POSTS CAROUSEL ===== */
 .trending-carousel-container {
     background: transparent;
     border-radius: 0;
-    padding: 0;
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+    margin: 0 auto var(--spacing-xl);
+    max-width: 480px;
     border: none;
+    overflow: visible;
 }
 
 .trending-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
-    padding: 0 var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    padding: 0;
 }
 
 .trending-header h5 {
     margin: 0;
     color: var(--text-white);
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
 }
@@ -553,33 +607,11 @@ main[role="main"].home-page {
 }
 
 .carousel-controls {
-    display: flex;
-    gap: var(--spacing-sm);
+    display: none;
 }
 
 .carousel-btn {
-    width: 32px;
-    height: 32px;
-    background: var(--color-dark);
-    border: 1px solid var(--color-primary-border);
-    border-radius: var(--radius-md);
-    color: var(--text-white);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-base);
-}
-
-.carousel-btn:hover:not(:disabled) {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    transform: scale(1.1);
-}
-
-.carousel-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    display: none;
 }
 
 .trending-carousel {
@@ -587,8 +619,7 @@ main[role="main"].home-page {
     overflow-y: visible;
     position: relative;
     cursor: grab;
-    padding: 8px 0;
-    margin: -8px 0;
+    width: 100%;
 }
 
 .trending-carousel:active {
@@ -597,10 +628,9 @@ main[role="main"].home-page {
 
 .carousel-track {
     display: flex;
-    gap: var(--spacing-lg);
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: var(--spacing-md);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     user-select: none;
-    padding: 4px 0;
 }
 
 .carousel-track.dragging {
@@ -608,29 +638,21 @@ main[role="main"].home-page {
     cursor: grabbing;
 }
 
-/* Trending Card - Full Width Slider */
+/* Trending Card - Compact Centered Slider */
 .trending-card {
     min-width: 100%;
     max-width: 100%;
     background: var(--color-dark);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--color-primary-border);
-    transition: all var(--transition-base);
     flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-}
-
-.trending-card:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 12px 32px var(--color-primary-glow);
-    transform: translateY(-6px);
+    box-shadow: var(--shadow-sm);
 }
 
 .trending-card-image {
     width: 100%;
-    height: 220px;
+    height: 160px;
     background-size: cover;
     background-position: center;
     position: relative;
@@ -641,7 +663,7 @@ main[role="main"].home-page {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 10px;
+    padding: var(--spacing-sm);
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
 }
 
@@ -649,12 +671,12 @@ main[role="main"].home-page {
     background: var(--color-accent);
     color: var(--text-white);
     font-size: 0.65rem;
-    padding: 4px 8px;
-    border-radius: 10px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--spacing-xs);
 }
 
 .trending-card-overlay .location-badge i {
@@ -662,69 +684,70 @@ main[role="main"].home-page {
 }
 
 .trending-card-body {
-    padding: 16px 20px;
+    padding: var(--spacing-sm) var(--spacing-md);
 }
 
 .trending-card-user {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
 }
 
 .trending-card-avatar {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     background: var(--color-primary);
     border-radius: var(--radius-circle);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.8rem;
     color: var(--text-white);
     flex-shrink: 0;
 }
 
 .trending-card-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: var(--text-white);
 }
 
 .trending-card-time {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--text-white-secondary);
 }
 
 .trending-card-content {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.8rem;
+    line-height: 1.4;
     color: var(--text-white-secondary);
-    margin-bottom: 12px;
+    margin-bottom: var(--spacing-sm);
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 .trending-card-stats {
     display: flex;
-    gap: 16px;
-    padding-top: 12px;
+    gap: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
     border-top: 1px solid var(--color-primary-border-subtle);
 }
 
 .stat-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.85rem;
+    gap: var(--spacing-xs);
+    font-size: 0.75rem;
     color: var(--text-white-secondary);
 }
 
 .stat-item i {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--color-accent);
 }
 
@@ -732,8 +755,12 @@ main[role="main"].home-page {
 .carousel-indicators {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    align-items: center;
+    gap: var(--spacing-sm);
     margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    position: relative;
+    z-index: 1;
 }
 
 .carousel-indicator {
@@ -745,6 +772,7 @@ main[role="main"].home-page {
     transition: all var(--transition-base);
     border: none;
     padding: 0;
+    flex-shrink: 0;
 }
 
 .carousel-indicator.active {
@@ -775,9 +803,8 @@ main[role="main"].home-page {
     .carousel-controls {
         display: none;
     }
-    
+
     .trending-carousel-overlay {
         padding: var(--spacing-md);
     }
-}
 }

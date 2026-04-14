@@ -19,14 +19,14 @@ public class HomeController : BaseController
             new TrendingPostViewModel
             {
                 Id = 1,
-                Content = "Rooftop vibes in BGC! The skyline at sunset hits different when you're 30 floors up. City living at its finest.",
-                Location = "BGC, Taguig",
-                ImageUrl = "https://images.unsplash.com/photo-1545486332-9e0999c535b2?w=400&h=200&fit=crop",
-                LikesCount = 42,
-                CommentsCount = 8,
-                ViewsCount = 200,
-                Username = "Jenny Lim",
-                TimeAgo = "15 min ago"
+                Content = "Conquered the highest peak in the Philippines! 2,954 meters of pain, but the view from the top? Worth every step.",
+                Location = "Mt. Apo, Davao",
+                ImageUrl = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop",
+                LikesCount = 189,
+                CommentsCount = 34,
+                ViewsCount = 1500,
+                Username = "Joy Dela Cruz",
+                TimeAgo = "1 day ago"
             },
             new TrendingPostViewModel
             {
@@ -43,6 +43,18 @@ public class HomeController : BaseController
             new TrendingPostViewModel
             {
                 Id = 3,
+                Content = "Rolling green hills, stone houses, and zero traffic. Batanes feels like a different country. The Honesty Coffee Shop is real!",
+                Location = "Batan Island, Batanes",
+                ImageUrl = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop",
+                LikesCount = 142,
+                CommentsCount = 28,
+                ViewsCount = 1100,
+                Username = "Marco Lim",
+                TimeAgo = "1 day ago"
+            },
+            new TrendingPostViewModel
+            {
+                Id = 4,
                 Content = "Kayaking through the Big Lagoon. Turquoise water, towering limestone cliffs. El Nido is the crown jewel of Palawan.",
                 Location = "Big Lagoon, El Nido",
                 ImageUrl = "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop",
@@ -51,18 +63,6 @@ public class HomeController : BaseController
                 ViewsCount = 890,
                 Username = "Mia Santos",
                 TimeAgo = "4 hrs ago"
-            },
-            new TrendingPostViewModel
-            {
-                Id = 4,
-                Content = "Caught my first barrel at Cloud 9! The surfing capital lives up to the hype. Stoked beyond words.",
-                Location = "Cloud 9, Siargao",
-                ImageUrl = "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop",
-                LikesCount = 103,
-                CommentsCount = 19,
-                ViewsCount = 720,
-                Username = "Sofia Diaz",
-                TimeAgo = "2 hrs ago"
             },
             new TrendingPostViewModel
             {
@@ -75,6 +75,42 @@ public class HomeController : BaseController
                 ViewsCount = 950,
                 Username = "Lito Aguilar",
                 TimeAgo = "4 hrs ago"
+            },
+            new TrendingPostViewModel
+            {
+                Id = 6,
+                Content = "Caught my first barrel at Cloud 9! The surfing capital lives up to the hype. Stoked beyond words.",
+                Location = "Cloud 9, Siargao",
+                ImageUrl = "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop",
+                LikesCount = 103,
+                CommentsCount = 19,
+                ViewsCount = 720,
+                Username = "Sofia Diaz",
+                TimeAgo = "2 hrs ago"
+            },
+            new TrendingPostViewModel
+            {
+                Id = 7,
+                Content = "Dove into the clearest lake in Asia. The underwater visibility is unbelievable. Coron is a diver's paradise.",
+                Location = "Kayangan Lake, Coron",
+                ImageUrl = "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop",
+                LikesCount = 97,
+                CommentsCount = 20,
+                ViewsCount = 680,
+                Username = "Dan Villanueva",
+                TimeAgo = "5 hrs ago"
+            },
+            new TrendingPostViewModel
+            {
+                Id = 8,
+                Content = "Had the BEST lechon at Zubuchon. Crispy skin, juicy meat. Sorry Manila, Cebu wins this round.",
+                Location = "Cebu City, Cebu",
+                ImageUrl = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=200&fit=crop",
+                LikesCount = 91,
+                CommentsCount = 22,
+                ViewsCount = 650,
+                Username = "Ana Garcia",
+                TimeAgo = "1 hr ago"
             }
         };
 

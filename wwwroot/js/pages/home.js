@@ -43,6 +43,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // ===== BUILD UI COMPONENTS =====
     UIService.buildLocationsSidebar('locations-sidebar', handleLocationClick);
 
+    // ===== TRENDING BUTTON HANDLER =====
+    const trendingBtn = document.getElementById('trending-btn');
+    if (trendingBtn) {
+        trendingBtn.addEventListener('click', () => {
+            resetView();
+        });
+    }
+
     // ===== MAP IS NOW CLEAN (no markers, no chips) =====
     // The sidebar on the left shows all locations vertically
 
@@ -61,6 +69,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextBtn = document.querySelector('.carousel-next');
     const indicatorsContainer = document.getElementById('carousel-indicators');
 
+    // Constants
+    const CAROUSEL_GAP = 16; // Matches CSS var(--spacing-md) = 1rem = 16px
+
     if (carouselTrack && prevBtn && nextBtn && carouselContainer) {
         let currentIndex = 0;
         const cards = document.querySelectorAll('.trending-card');
@@ -78,8 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const getCardWidth = () => {
             const containerWidth = carouselContainer.offsetWidth;
-            const gap = 16; // spacing-lg
-            return containerWidth + gap;
+            return containerWidth + CAROUSEL_GAP;
         };
 
         // Create indicator dots
@@ -119,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Ensure currentIndex is within bounds
             currentIndex = Math.max(0, Math.min(currentIndex, maxIndex));
 
-            // Move the track
+            // Move the track (includes gap in calculation)
             const translateX = -(currentIndex * cardWidth);
             carouselTrack.style.transform = `translateX(${translateX}px)`;
             prevTranslate = translateX;
