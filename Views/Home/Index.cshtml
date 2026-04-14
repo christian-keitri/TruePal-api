@@ -17,50 +17,10 @@
 
 <div class="split-layout">
     <!-- Left Half: Map -->
-    <div class="map-section">
-        <!-- Vertical Location Sidebar -->
-        <div class="locations-sidebar" id="locations-sidebar"></div>
-        
-        <div id="philippine-map"></div>
-        
-        @if (!Model.IsAuthenticated)
-        {
-            <partial name="Components/_AuthOverlay" />
-        }
-    </div>
+    <partial name="_MapSection" model="Model" />
     
     <!-- Right Half: Details -->
-    <div class="details-section">
-        <div class="details-header">
-            <h2 id="location-title">
-                <i class="bi bi-geo-alt-fill me-2"></i>
-                Explore the Philippines
-            </h2>
-            <p class="text-muted" id="location-subtitle">Click any location on the map or chip below to see posts</p>
-        </div>
-        
-        <div class="details-content" id="posts-container">
-            <!-- Welcome message when no location selected -->
-            <div class="welcome-message" id="welcome-message">
-                <i class="bi bi-map welcome-message-icon"></i>
-                <h3>Discover Amazing Places</h3>
-                <p class="text-muted">Select a location from the map to see posts, photos, and stories from travelers.</p>
-                <div class="featured-locations mt-4">
-                    <h5 class="mb-3">Popular Destinations</h5>
-                    <div class="location-grid">
-                        <span class="location-badge"><i class="bi bi-umbrella"></i> Boracay</span>
-                        <span class="location-badge"><i class="bi bi-gem"></i> El Nido</span>
-                        <span class="location-badge"><i class="bi bi-tsunami"></i> Siargao</span>
-                        <span class="location-badge"><i class="bi bi-tree"></i> Baguio</span>
-                        <span class="location-badge"><i class="bi bi-shop"></i> Cebu</span>
-                        <span class="location-badge"><i class="bi bi-wind"></i> Batanes</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Posts will be dynamically loaded here -->
-        </div>
-    </div>
+    <partial name="_DetailsSection" model="Model" />
 </div>
 
 @section Scripts {

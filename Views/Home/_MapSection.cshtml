@@ -1,0 +1,14 @@
+@model HomeViewModel
+
+<!-- Left Half: Map Section -->
+<div class="map-section">
+    <!-- Vertical Location Sidebar -->
+    <div class="locations-sidebar" id="locations-sidebar"></div>
+    
+    <div id="philippine-map"></div>
+    
+    @if (!Model.IsAuthenticated)
+    {
+        <partial name="Components/_AuthOverlay" />
+    }
+</div>

@@ -11,7 +11,7 @@ export class PostsService {
         this.postsContainer = document.getElementById(containerId);
         this.locationTitle = document.getElementById(titleId);
         this.locationSubtitle = document.getElementById(subtitleId);
-        this.welcomeMessage = document.getElementById('welcome-message');
+        this.carouselContainer = document.querySelector('.trending-carousel-container');
     }
 
     /**
@@ -43,12 +43,28 @@ export class PostsService {
     }
 
     /**
-     * Hide welcome message
+     * Hide carousel
      */
     hideWelcomeMessage() {
-        if (this.welcomeMessage) {
-            this.welcomeMessage.style.display = 'none';
+        if (this.carouselContainer) {
+            this.carouselContainer.style.display = 'none';
         }
+    }
+
+    /**
+     * Show carousel
+     */
+    showWelcomeMessage() {
+        if (this.carouselContainer) {
+            this.carouselContainer.style.display = 'block';
+        }
+
+        // Reset header to default
+        this.locationTitle.innerHTML = '<i class="bi bi-geo-alt-fill me-2"></i>Explore the Philippines';
+        this.locationSubtitle.textContent = 'Click any location on the map or chip below to see posts';
+
+        // Clear posts container
+        this.postsContainer.innerHTML = '';
     }
 
     /**
