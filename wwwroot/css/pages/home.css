@@ -237,6 +237,7 @@ main[role="main"].home-page {
     padding: var(--spacing-lg) var(--spacing-xl);
     border-bottom: 2px solid var(--color-primary);
     background: var(--color-dark-lighter);
+    text-align: center;
 }
 
 .details-header h2 {
@@ -245,6 +246,7 @@ main[role="main"].home-page {
     font-weight: 700;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .details-header h2 i {
