@@ -57,9 +57,9 @@ export class PostsService {
     showEmptyState(regionName) {
         this.postsContainer.innerHTML = `
             <div class="welcome-message" style="display: block;">
-                <i class="bi bi-camera" style="font-size: 4rem; color: var(--color-primary); margin-bottom: 1rem;"></i>
+                <i class="bi bi-camera welcome-message-icon"></i>
                 <h3>No Posts Yet</h3>
-                <p class="text-muted">No one has shared about ${regionName} yet.<br>Be the first to post!</p>
+                <p>No one has shared about ${regionName} yet.<br>Be the first to post!</p>
             </div>`;
     }
 

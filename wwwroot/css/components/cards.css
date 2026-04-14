@@ -3,11 +3,11 @@
 
 /* Base Flex Card */
 .flex-card {
-    background: var(--bg-white);
+    background: var(--color-dark-lighter);
     border-radius: var(--radius-xl);
     overflow: hidden;
     margin-bottom: var(--spacing-md);
-    border: 1px solid #eee;
+    border: 1px solid var(--color-primary-border);
     transition: all var(--transition-base);
 }
 
@@ -74,19 +74,19 @@
 .flex-card-name {
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--text-primary);
+    color: var(--text-white);
 }
 
 .flex-card-time {
     font-size: 0.75rem;
-    color: var(--text-muted);
+    color: var(--text-white-secondary);
 }
 
 /* Card Content */
 .flex-card-content {
     font-size: 0.9rem;
     line-height: 1.5;
-    color: #444;
+    color: var(--text-white-secondary);
     margin-bottom: 12px;
 }
 
@@ -95,13 +95,13 @@
     display: flex;
     gap: 16px;
     padding-top: 10px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--color-primary-border-subtle);
 }
 
 .flex-card-action {
     background: none;
     border: none;
-    color: #888;
+    color: var(--text-white-secondary);
     font-size: 0.8rem;
     cursor: pointer;
     display: flex;
@@ -132,7 +132,7 @@
 }
 
 .empty-state p {
-    color: var(--text-muted);
+    color: var(--text-white-secondary);
     margin-top: 12px;
     font-size: 0.9rem;
 }

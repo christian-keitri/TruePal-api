@@ -13,10 +13,26 @@
     /* Deeper amber - active states */
     --color-primary-light: rgba(255, 193, 7, 0.15);
     /* Subtle backgrounds */
+    --color-primary-border-subtle: rgba(255, 193, 7, 0.1);
+    /* Very subtle borders/dividers */
+    --color-primary-border: rgba(255, 193, 7, 0.2);
+    /* Borders on dark surfaces */
     --color-primary-glow: rgba(255, 193, 7, 0.4);
     /* Focus rings */
+    --color-primary-glow-md: rgba(255, 193, 7, 0.5);
+    /* Medium glow for markers */
+    --color-primary-glow-lg: rgba(255, 193, 7, 0.6);
+    /* Large glow for hover states */
+    --color-primary-glow-xl: rgba(255, 193, 7, 0.7);
+    /* Extra large glow */
+    --color-primary-glow-bright: rgba(255, 193, 7, 0.8);
+    /* Bright glow for active states */
+    --color-primary-glow-full: rgba(255, 193, 7, 1);
+    /* Full opacity glow */
     --color-primary-gradient: linear-gradient(90deg, #FFC107, #FFB300);
     /* Modern depth gradient */
+    --color-primary-radial: radial-gradient(circle, rgba(255, 193, 7, 0.6) 0%, rgba(255, 193, 7, 0) 70%);
+    /* Radial glow effect */
 
     /* Accent Yellow - Amber (#FFB300) */
     --color-accent: #FFB300;
@@ -130,10 +146,38 @@
     --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
     --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.2);
 
+    /* Marker/Pin Shadows with Glow */
+    --shadow-marker: 0 4px 16px var(--color-primary-glow-md), 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-marker-hover: 0 8px 24px var(--color-primary-glow-xl), 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-marker-active: 0 8px 28px var(--color-primary-glow-bright), 0 4px 16px rgba(0, 0, 0, 0.6);
+    --shadow-marker-selected: 0 12px 36px var(--color-primary-glow-full), 0 6px 20px rgba(0, 0, 0, 0.7);
+
+    /* Chip/Badge Shadows */
+    --shadow-chip: 0 4px 12px var(--color-primary-glow), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-chip-hover: 0 8px 24px var(--color-primary-glow-lg), 0 4px 8px rgba(0, 0, 0, 0.4);
+
+    /* Map Control Shadows */
+    --shadow-map-control: 0 4px 16px rgba(0, 0, 0, 0.12);
+
     /* ===== TRANSITIONS ===== */
     --transition-fast: 0.15s ease;
     --transition-base: 0.3s ease;
     --transition-slow: 0.5s ease;
+}
+
+/* ===== GLOBAL DEFAULTS ===== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-white);
+}
+
+p {
+    color: var(--text-white-secondary);
 }
 
 /* ===== UTILITY CLASSES ===== */
@@ -206,7 +250,7 @@
 /* ===== CARD COMPONENTS ===== */
 
 .theme-card {
-    background: var(--bg-white);
+    background: var(--color-dark-lighter);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     padding: var(--spacing-lg);
@@ -220,13 +264,19 @@
 
 /* Bootstrap Card Override */
 .card {
+    background: var(--color-dark-lighter);
     border-radius: 15px;
     box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-primary-border);
 }
 
 .card-body {
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-primary-border);
     border-radius: 15px;
+}
+
+.card-title {
+    color: var(--text-white) !important;
 }
 
 /* ===== BUTTON COMPONENTS ===== */
@@ -308,7 +358,7 @@
 }
 
 .btn-outline-primary {
-    color: var(--color-primary) !important;
+    color: var(--text-white) !important;
     border-color: var(--color-primary) !important;
     background-color: transparent !important;
 }
@@ -316,7 +366,7 @@
 .btn-outline-primary:hover {
     background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
-    color: var(--text-white) !important;
+    color: var(--color-dark) !important;
 }
 
 /* ===== BADGE COMPONENTS ===== */
@@ -378,11 +428,31 @@ a.link-theme:hover {
 
 /* ===== INPUT FOCUS STATES ===== */
 
+.form-label,
+label {
+    color: var(--text-white);
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--color-dark-lighter);
+    border-color: rgba(255, 193, 7, 0.2);
+    color: var(--text-white);
+}
+
+.form-control::placeholder {
+    color: var(--text-white-secondary);
+    opacity: 0.6;
+}
+
 .form-control:focus,
 .form-select:focus,
 .form-check-input:focus {
+    background-color: var(--color-dark-lighter);
     border-color: var(--color-primary);
     box-shadow: 0 0 0 0.2rem var(--color-primary-glow);
+    color: var(--text-white);
 }
 
 /* Checkbox Override */
@@ -401,7 +471,7 @@ a.link-theme:hover {
     border-radius: var(--radius-pill);
     padding: var(--spacing-sm) var(--spacing-md);
     transition: all 0.3s ease;
-    color: var(--text-primary) !important;
+    color: var(--text-white-secondary) !important;
     border: none;
     margin-right: 8px;
 }
@@ -411,7 +481,8 @@ a.link-theme:hover {
 }
 
 .nav-tabs .nav-link:hover {
-    background: var(--color-primary-light);
+    background: var(--color-dark-lighter);
+    color: var(--color-primary) !important;
     border: none;
 }
 
@@ -421,6 +492,11 @@ a.link-theme:hover {
     font-weight: 700;
     box-shadow: 0 4px 15px var(--color-primary-glow);
     border: none;
+}
+
+/* Override Bootstrap text utilities for dark theme */
+.text-muted {
+    color: var(--text-white-secondary) !important;
 }
 
 .nav-tabs .nav-link.active i {
