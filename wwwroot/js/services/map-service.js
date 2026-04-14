@@ -82,10 +82,10 @@ export class MapService {
      */
     createMarkerElement(location) {
         const el = document.createElement('div');
-        el.className = 'map-pin';
+        el.className = 'map-marker';
         el.innerHTML = `
-            <div class="map-pin-pulse"></div>
-            <div class="map-pin-inner">
+            <div class="map-marker-pulse"></div>
+            <div class="map-marker-circle">
                 <i class="bi ${location.icon}"></i>
             </div>
         `;
