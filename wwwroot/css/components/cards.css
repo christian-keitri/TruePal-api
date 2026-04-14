@@ -12,8 +12,8 @@
 }
 
 .flex-card:hover {
-    border-color: var(--primary-yellow);
-    box-shadow: 0 8px 24px rgba(201, 169, 97, 0.15);
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 24px var(--color-primary-glow);
     transform: translateY(-2px);
 }
 
@@ -36,7 +36,7 @@
 }
 
 .flex-card-image-overlay .badge {
-    background: var(--primary-yellow);
+    background: var(--color-accent);
     color: var(--text-white);
     font-size: 0.7rem;
     padding: 4px 10px;
@@ -60,7 +60,7 @@
 .flex-card-avatar {
     width: 40px;
     height: 40px;
-    background: var(--primary-yellow);
+    background: var(--color-accent);
     border-radius: var(--radius-circle);
     display: flex;
     align-items: center;
@@ -112,7 +112,7 @@
 }
 
 .flex-card-action:hover {
-    color: var(--primary-yellow);
+    color: var(--color-primary);
 }
 
 .flex-card-action .count {
@@ -127,7 +127,7 @@
 
 .empty-state i {
     font-size: 3rem;
-    color: var(--primary-yellow);
+    color: var(--color-accent);
     opacity: 0.5;
 }
 

@@ -26,7 +26,7 @@
 /* Panel Header */
 .posts-panel-header {
     padding: 20px 24px 16px;
-    border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+    border-bottom: 1px solid var(--color-primary-light);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -47,8 +47,8 @@
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: var(--primary-yellow-light);
-    color: var(--primary-yellow);
+    background: var(--color-accent-light);
+    color: var(--color-accent);
     font-size: 1.2rem;
     cursor: pointer;
     display: flex;
@@ -58,7 +58,7 @@
 }
 
 .posts-panel-close:hover {
-    background: var(--primary-yellow);
+    background: var(--color-accent);
     color: var(--text-white);
 }
 
