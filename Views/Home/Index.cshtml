@@ -18,14 +18,15 @@
 <div class="split-layout">
     <!-- Left Half: Map -->
     <div class="map-section">
+        <!-- Vertical Location Sidebar -->
+        <div class="locations-sidebar" id="locations-sidebar"></div>
+        
         <div id="philippine-map"></div>
         
         @if (!Model.IsAuthenticated)
         {
             <partial name="Components/_AuthOverlay" />
         }
-        
-        <div class="region-chips" id="region-chips"></div>
     </div>
     
     <!-- Right Half: Details -->

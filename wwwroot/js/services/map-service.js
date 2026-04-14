@@ -36,10 +36,7 @@ export class MapService {
         });
 
         // Add controls
-        this.map.addControl(
-            new maplibregl.AttributionControl({ compact: true }),
-            'bottom-left'
-        );
+        // Attribution hidden for cleaner look
         this.map.addControl(
             new maplibregl.NavigationControl({ visualizePitch: true }),
             'top-right'

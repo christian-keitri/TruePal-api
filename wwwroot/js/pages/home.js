@@ -21,18 +21,18 @@ document.addEventListener('DOMContentLoaded', function () {
         // Fly to location on map
         mapService.flyToLocation(location);
 
-        // Update active chip
-        UIService.setActiveChip(location.name);
+        // Update active state in sidebar
+        UIService.setActiveSidebarLocation(location.name);
 
         // Show posts for location
         postsService.showPosts(location.name);
     }
 
     // ===== BUILD UI COMPONENTS =====
-    UIService.buildRegionChips('region-chips', handleLocationClick);
+    UIService.buildLocationsSidebar('locations-sidebar', handleLocationClick);
 
-    // ===== ADD MARKERS TO MAP =====
-    mapService.addMarkers(handleLocationClick);
+    // ===== MAP IS NOW CLEAN (no markers, no chips) =====
+    // The sidebar on the left shows all locations vertically
 
     // ===== MAP CLICK HANDLER (Optional) =====
     mapService.onMapClick((e) => {

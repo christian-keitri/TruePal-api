@@ -54,4 +54,53 @@ export class UIService {
             chip.classList.remove('active');
         });
     }
+
+    /**
+     * Build vertical locations sidebar
+     */
+    static buildLocationsSidebar(containerId, onLocationClick) {
+        const sidebar = document.getElementById(containerId);
+        if (!sidebar) return;
+
+        sidebar.innerHTML = ''; // Clear existing
+
+        locations.forEach(location => {
+            const item = document.createElement('div');
+            item.className = 'sidebar-location';
+            item.dataset.locationName = location.name;
+            item.innerHTML = `
+                <div class="sidebar-marker-circle">
+                    <i class="bi ${location.icon}"></i>
+                </div>
+                <span class="sidebar-location-name">${location.name}</span>
+            `;
+
+            item.addEventListener('click', () => {
+                // Update active state
+                document.querySelectorAll('.sidebar-location').forEach(loc => {
+                    loc.classList.remove('active');
+                });
+                item.classList.add('active');
+
+                // Trigger callback
+                if (onLocationClick) {
+                    onLocationClick(location);
+                }
+            });
+
+            sidebar.appendChild(item);
+        });
+    }
+
+    /**
+     * Set active location in sidebar
+     */
+    static setActiveSidebarLocation(locationName) {
+        document.querySelectorAll('.sidebar-location').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.locationName === locationName) {
+                item.classList.add('active');
+            }
+        });
+    }
 }

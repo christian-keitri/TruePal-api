@@ -28,6 +28,211 @@ main[role="main"].home-page {
     height: 100%;
 }
 
+/* ===== FLOATING VERTICAL MARKERS (Left Side) ===== */
+.locations-sidebar {
+    position: absolute;
+    left: var(--spacing-md);
+    top: var(--spacing-md);
+    bottom: var(--spacing-md);
+    width: auto;
+    z-index: 100;
+    overflow-y: auto;
+    overflow-x: visible;
+    padding: 0 12px 0 0;
+    /* Add right padding for scale room */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+    pointer-events: none;
+}
+
+/* Hide scrollbar */
+.locations-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.locations-sidebar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Floating location marker */
+.sidebar-location {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    pointer-events: all;
+    padding: 8px;
+    /* Add padding to prevent clipping */
+    overflow: visible;
+    /* Ensure scaled circles aren't cut off */
+}
+
+.sidebar-location:hover {
+    transform: translateX(6px);
+}
+
+/* Marker circle */
+.sidebar-marker-circle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--color-dark);
+    box-shadow:
+        0 4px 16px rgba(255, 193, 7, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    animation: float-marker 3s ease-in-out infinite;
+}
+
+/* Stagger animation delay for wave effect */
+.sidebar-location:nth-child(1) .sidebar-marker-circle {
+    animation-delay: 0s;
+}
+
+.sidebar-location:nth-child(2) .sidebar-marker-circle {
+    animation-delay: 0.15s;
+}
+
+.sidebar-location:nth-child(3) .sidebar-marker-circle {
+    animation-delay: 0.3s;
+}
+
+.sidebar-location:nth-child(4) .sidebar-marker-circle {
+    animation-delay: 0.45s;
+}
+
+.sidebar-location:nth-child(5) .sidebar-marker-circle {
+    animation-delay: 0.6s;
+}
+
+.sidebar-location:nth-child(6) .sidebar-marker-circle {
+    animation-delay: 0.75s;
+}
+
+.sidebar-location:nth-child(7) .sidebar-marker-circle {
+    animation-delay: 0.9s;
+}
+
+.sidebar-location:nth-child(8) .sidebar-marker-circle {
+    animation-delay: 1.05s;
+}
+
+.sidebar-location:nth-child(9) .sidebar-marker-circle {
+    animation-delay: 1.2s;
+}
+
+.sidebar-location:nth-child(10) .sidebar-marker-circle {
+    animation-delay: 1.35s;
+}
+
+.sidebar-location:nth-child(11) .sidebar-marker-circle {
+    animation-delay: 1.5s;
+}
+
+.sidebar-location:nth-child(12) .sidebar-marker-circle {
+    animation-delay: 1.65s;
+}
+
+.sidebar-location:nth-child(13) .sidebar-marker-circle {
+    animation-delay: 1.8s;
+}
+
+.sidebar-location:nth-child(14) .sidebar-marker-circle {
+    animation-delay: 1.95s;
+}
+
+.sidebar-location:nth-child(15) .sidebar-marker-circle {
+    animation-delay: 2.1s;
+}
+
+.sidebar-location:nth-child(16) .sidebar-marker-circle {
+    animation-delay: 2.25s;
+}
+
+.sidebar-location:nth-child(17) .sidebar-marker-circle {
+    animation-delay: 2.4s;
+}
+
+.sidebar-location:nth-child(18) .sidebar-marker-circle {
+    animation-delay: 2.55s;
+}
+
+.sidebar-location:nth-child(19) .sidebar-marker-circle {
+    animation-delay: 2.7s;
+}
+
+.sidebar-location:nth-child(20) .sidebar-marker-circle {
+    animation-delay: 2.85s;
+}
+
+/* Continuous floating animation */
+@keyframes float-marker {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-8px) scale(1.02);
+    }
+}
+
+.sidebar-location:hover .sidebar-marker-circle {
+    transform: translateY(-8px) scale(1.15);
+    box-shadow:
+        0 8px 24px rgba(255, 193, 7, 0.7),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: var(--color-primary);
+    animation-play-state: paused;
+    /* Pause float on hover */
+}
+
+.sidebar-location.active .sidebar-marker-circle {
+    transform: translateY(-8px) scale(1.2);
+    box-shadow:
+        0 8px 28px rgba(255, 193, 7, 0.8),
+        0 4px 16px rgba(0, 0, 0, 0.6);
+    border-color: var(--color-primary);
+    animation: pulse-marker 2s ease-in-out infinite, float-marker 3s ease-in-out infinite;
+}
+
+@keyframes pulse-marker {
+
+    0%,
+    100% {
+        box-shadow:
+            0 8px 28px rgba(255, 193, 7, 0.8),
+            0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    50% {
+        box-shadow:
+            0 12px 36px rgba(255, 193, 7, 1),
+            0 6px 20px rgba(0, 0, 0, 0.7);
+    }
+}
+
+.sidebar-marker-circle i {
+    color: var(--color-dark);
+    font-size: 1.4rem;
+}
+
+/* Hide location name by default */
+.sidebar-location-name {
+    display: none;
+}
+
 /* Right Half: Details Section */
 .details-section {
     flex: 0 0 50%;
@@ -301,14 +506,14 @@ main[role="main"].home-page {
 }
 
 .maplibregl-ctrl-top-right {
-    top: 70px !important;
+    top: 20px !important;
     right: 12px !important;
 }
 
-.maplibregl-ctrl-attrib {
-    background: rgba(255, 255, 255, 0.6) !important;
-    border-radius: 8px !important;
-    font-size: 0.65rem !important;
+/* Hide attribution button and controls */
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-attrib-button {
+    display: none !important;
 }
 
 /* ===== RESPONSIVE ===== */
