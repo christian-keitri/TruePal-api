@@ -10,8 +10,8 @@ main[role="main"].home-page {
 .split-layout {
     display: flex;
     width: 100%;
-    height: calc(100vh - 66px);
-    /* Adjust based on navbar height */
+    height: calc(100vh - 58px);
+    /* Adjusted for compact navbar */
     overflow: hidden;
 }
 
