@@ -23,49 +23,61 @@
         body {
             display: flex;
             flex-direction: column;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            background: var(--bg-primary);
             color: var(--text-primary);
         }
 
         .navbar {
-            background-color: var(--bg-white) !important;
-            border-bottom: 2px solid var(--color-primary);
-            box-shadow: var(--shadow-sm);
+            background-color: var(--color-dark) !important;
+            border-bottom: 3px solid var(--color-primary);
+            box-shadow: var(--shadow-md);
         }
 
         .navbar-brand {
-            color: var(--text-primary) !important;
+            color: var(--text-white) !important;
             font-weight: 700;
+            transition: var(--transition-base);
+        }
+
+        .navbar-brand:hover {
+            opacity: 0.9;
         }
 
         .navbar-nav {
-            gap: 16px;
+            gap: var(--spacing-sm);
         }
 
         .nav-link {
-            border-radius: var(--radius-pill);
+            border-radius: var(--radius-md);
             padding: var(--spacing-sm) var(--spacing-md);
-            transition: all 0.3s ease;
-            color: var(--text-primary) !important;
+            transition: var(--transition-base);
+            color: var(--text-white) !important;
+            font-weight: 500;
         }
 
         .nav-link i {
-            color: var(--color-accent);
+            color: var(--color-primary);
+            transition: var(--transition-base);
         }
 
         .nav-link:hover {
-            background: var(--color-primary-light);
+            background: var(--color-dark-lighter);
+            color: var(--color-primary) !important;
+        }
+
+        .nav-link:hover i {
+            color: var(--color-primary);
         }
 
         .nav-link.active {
             background: var(--color-primary);
-            color: white !important;
+            color: var(--color-dark) !important;
             font-weight: 700;
-            box-shadow: 0 4px 15px var(--color-primary-glow);
+            box-shadow: 0 4px 12px var(--color-primary-glow);
         }
 
         .nav-link.active i {
-            color: white;
+            color: var(--color-dark);
         }
 
         main {
@@ -74,16 +86,16 @@
         }
 
         footer {
-            background-color: var(--bg-white);
-            color: var(--text-primary);
+            background-color: var(--color-dark);
+            color: var(--text-white);
             padding: var(--spacing-md) 0;
-            border-top: 2px solid var(--color-primary);
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            border-top: 3px solid var(--color-primary);
+            box-shadow: var(--shadow-md);
             margin-top: 0;
         }
 
         footer i {
-            color: var(--color-accent);
+            color: var(--color-primary);
         }
     </style>
     
@@ -91,14 +103,14 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <img src="~/images/logo.png" alt="TruePal" style="height: 60px; width: auto;" />
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand position-absolute start-50 translate-middle-x" asp-controller="Home" asp-action="Index">
-                <img src="~/images/logo.png" alt="TruePal" style="height: 80px; width: auto;" />
-            </a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">

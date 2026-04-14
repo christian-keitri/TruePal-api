@@ -1,55 +1,126 @@
-/* TruePal Theme - Logo-Derived Color Scheme */
-/* Colors extracted from logo: Globe Blue, Orange "Bob" text, Green continents, Red pin, Neon glow */
+/* TruePal Theme - Professional Black & Yellow Scheme */
+/* Goldenrod & Jet Black - Clean, energetic, modern design */
 
 :root {
     /* ===== COLOR PALETTE ===== */
 
-    /* Primary Brand (Globe Blue) */
-    --color-primary: #1976D2;
-    --color-primary-dark: #1260A8;
-    --color-primary-light: rgba(25, 118, 210, 0.1);
-    --color-primary-glow: rgba(25, 118, 210, 0.3);
+    /* Primary Yellow - Goldenrod (#FFC107) */
+    --color-primary: #FFC107;
+    /* Bright, energetic - perfect for buttons and highlights */
+    --color-primary-dark: #FFB300;
+    /* Amber - hover states & secondary accents */
+    --color-primary-darker: #FFA000;
+    /* Deeper amber - active states */
+    --color-primary-light: rgba(255, 193, 7, 0.15);
+    /* Subtle backgrounds */
+    --color-primary-glow: rgba(255, 193, 7, 0.4);
+    /* Focus rings */
+    --color-primary-gradient: linear-gradient(90deg, #FFC107, #FFB300);
+    /* Modern depth gradient */
 
-    /* Accent (Orange from "Bob" text) */
-    --color-accent: #F5A623;
-    --color-accent-dark: #E09500;
-    --color-accent-light: rgba(245, 166, 35, 0.1);
-    --color-accent-glow: rgba(245, 166, 35, 0.3);
+    /* Accent Yellow - Amber (#FFB300) */
+    --color-accent: #FFB300;
+    /* Slightly deeper tone - highlights */
+    --color-accent-dark: #FFA000;
+    /* Hover amber */
+    --color-accent-light: rgba(255, 179, 0, 0.1);
+    --color-accent-glow: rgba(255, 179, 0, 0.3);
 
-    /* Semantic Colors (from logo elements) */
-    --color-success: #43A047;       /* Continent green */
-    --color-danger: #E53935;        /* Pin marker red */
-    --color-info: #29B6F6;          /* Neon glow blue */
+    /* Optional Accent Colors */
+    --color-blue: #007BFF;
+    /* Electric Blue - pairs beautifully for CTAs */
+    --color-orange: #FF9800;
+    /* Warm Orange - friendly, social vibe */
 
-    /* Neutral Backgrounds */
-    --bg-primary: #F5F7FA;
-    --bg-secondary: #E8ECF0;
-    --bg-tertiary: #D6DBE0;
-    --bg-white: #ffffff;
+    /* Semantic Colors */
+    --color-success: #4CAF50;
+    /* Green - success states */
+    --color-danger: #F44336;
+    /* Red - errors/warnings */
+    --color-info: #007BFF;
+    /* Electric Blue - info messages */
+    --color-warning: #FF9800;
+    /* Warm Orange - warnings */
 
-    /* Dark (Logo background) */
-    --color-dark: #3D3D3D;
+    /* Black Tones */
+    --color-black: #121212;
+    /* Jet Black - clean, modern base for backgrounds */
+    --color-dark: #121212;
+    /* Primary background (Jet Black) */
+    --color-dark-lighter: #1E1E1E;
+    /* Charcoal - softer black for cards/containers */
+    --color-dark-elevated: #1E1E1E;
+    /* Elevated surfaces (Charcoal) */
+    --color-dark-border: #2A2A2A;
+    /* Borders on dark surfaces */
+
+    /* Neutral Grays */
+    --color-gray-main: #B0B0B0;
+    /* Cool Gray - subtle text/dividers */
+    --color-gray-900: #1E1E1E;
+    /* Charcoal */
+    --color-gray-800: #2A2A2A;
+    --color-gray-700: #505050;
+    --color-gray-600: #757575;
+    --color-gray-500: #9E9E9E;
+    --color-gray-400: #B0B0B0;
+    /* Cool Gray */
+    --color-gray-300: #CCCCCC;
+    --color-gray-200: #E0E0E0;
+    --color-gray-100: #F5F5F5;
+
+    /* Light Backgrounds */
+    --bg-primary: #FFFFFF;
+    /* Pure white - main light bg */
+    --bg-secondary: #FAFAFA;
+    /* Off-white - subtle contrast */
+    --bg-tertiary: #F5F5F5;
+    /* Light gray - sections */
+    --bg-dark: #121212;
+    /* Jet Black - dark mode background */
+    --bg-dark-elevated: #1E1E1E;
+    /* Charcoal - elevated dark surfaces */
+    --bg-white: #FFFFFF;
 
     /* Text Colors */
-    --text-primary: #2D3436;
-    --text-secondary: #636E72;
-    --text-muted: #B2BEC3;
-    --text-white: #ffffff;
+    --text-primary: #121212;
+    /* Jet Black - main text on light */
+    --text-secondary: #757575;
+    /* Gray - secondary text on light */
+    --text-muted: #B0B0B0;
+    /* Cool Gray - metadata on light */
+    --text-white: #FFFFFF;
+    /* Pure white - text on dark backgrounds */
+    --text-white-secondary: #B0B0B0;
+    /* Cool Gray - secondary text on dark */
+    --text-yellow: #FFC107;
+    /* Goldenrod - highlighted text */
 
     /* ===== SPACING SCALE ===== */
-    --spacing-xs: 0.25rem;     /* 4px */
-    --spacing-sm: 0.5rem;      /* 8px */
-    --spacing-md: 1rem;        /* 16px */
-    --spacing-lg: 1.5rem;      /* 24px */
-    --spacing-xl: 2rem;        /* 32px */
-    --spacing-2xl: 3rem;       /* 48px */
-    --spacing-3xl: 4rem;       /* 64px */
+    --spacing-xs: 0.25rem;
+    /* 4px */
+    --spacing-sm: 0.5rem;
+    /* 8px */
+    --spacing-md: 1rem;
+    /* 16px */
+    --spacing-lg: 1.5rem;
+    /* 24px */
+    --spacing-xl: 2rem;
+    /* 32px */
+    --spacing-2xl: 3rem;
+    /* 48px */
+    --spacing-3xl: 4rem;
+    /* 64px */
 
     /* ===== BORDER RADIUS ===== */
-    --radius-sm: 0.25rem;      /* 4px */
-    --radius-md: 0.5rem;       /* 8px */
-    --radius-lg: 1rem;         /* 16px */
-    --radius-xl: 1.5rem;       /* 24px */
+    --radius-sm: 0.25rem;
+    /* 4px */
+    --radius-md: 0.5rem;
+    /* 8px */
+    --radius-lg: 1rem;
+    /* 16px */
+    --radius-xl: 1.5rem;
+    /* 24px */
     --radius-pill: 20px;
     --radius-circle: 50%;
 
@@ -92,17 +163,45 @@
 }
 
 /* Spacing Utilities */
-.p-xs { padding: var(--spacing-xs); }
-.p-sm { padding: var(--spacing-sm); }
-.p-md { padding: var(--spacing-md); }
-.p-lg { padding: var(--spacing-lg); }
-.p-xl { padding: var(--spacing-xl); }
+.p-xs {
+    padding: var(--spacing-xs);
+}
 
-.m-xs { margin: var(--spacing-xs); }
-.m-sm { margin: var(--spacing-sm); }
-.m-md { margin: var(--spacing-md); }
-.m-lg { margin: var(--spacing-lg); }
-.m-xl { margin: var(--spacing-xl); }
+.p-sm {
+    padding: var(--spacing-sm);
+}
+
+.p-md {
+    padding: var(--spacing-md);
+}
+
+.p-lg {
+    padding: var(--spacing-lg);
+}
+
+.p-xl {
+    padding: var(--spacing-xl);
+}
+
+.m-xs {
+    margin: var(--spacing-xs);
+}
+
+.m-sm {
+    margin: var(--spacing-sm);
+}
+
+.m-md {
+    margin: var(--spacing-md);
+}
+
+.m-lg {
+    margin: var(--spacing-lg);
+}
+
+.m-xl {
+    margin: var(--spacing-xl);
+}
 
 /* ===== CARD COMPONENTS ===== */
 

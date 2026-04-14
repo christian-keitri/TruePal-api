@@ -6,15 +6,35 @@
 
 ### Colors
 ```css
-var(--primary-yellow)       /* #c9a961 - Brand color */
-var(--primary-yellow-dark)  /* Hover states */
+/* Primary (Goldenrod) */
+var(--color-primary)        /* #FFC107 - Bright, energetic */
+var(--color-primary-dark)   /* #FFB300 - Amber hover */
+var(--color-primary-light)  /* Subtle backgrounds */
+var(--color-primary-gradient) /* linear-gradient(90deg, #FFC107, #FFB300) */
 
-var(--text-primary)         /* #333 - Main text */
-var(--text-secondary)       /* #666 - Secondary text */
-var(--text-muted)           /* #999 - Metadata */
+/* Accent (Amber) */
+var(--color-accent)         /* #FFB300 - Highlights */
 
-var(--bg-primary)           /* #f5f5f5 - Light gray */
-var(--bg-white)             /* White backgrounds */
+/* Black Tones */
+var(--color-dark)           /* #121212 - Jet Black backgrounds */
+var(--color-dark-lighter)   /* #1E1E1E - Charcoal cards */
+var(--color-black)          /* #121212 - Jet Black */
+
+/* Optional Accents */
+var(--color-blue)           /* #007BFF - Electric Blue */
+var(--color-orange)         /* #FF9800 - Warm Orange */
+
+/* Text */
+var(--text-primary)         /* #121212 - Main text */
+var(--text-secondary)       /* #757575 - Secondary text */
+var(--text-muted)           /* #B0B0B0 - Cool Gray metadata */
+var(--text-white)           /* #FFFFFF - Text on dark */
+
+/* Backgrounds */
+var(--bg-primary)           /* #FFFFFF - Light bg */
+var(--bg-dark)              /* #121212 - Jet Black */
+var(--bg-dark-elevated)     /* #1E1E1E - Charcoal elevated */
+var(--bg-white)             /* #FFFFFF - White surfaces */
 ```
 
 ### Spacing
