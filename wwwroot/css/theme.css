@@ -607,3 +607,77 @@ label {
 .nav-tabs {
     border-bottom: 2px solid var(--color-primary-light);
 }
+}
+
+/* ===== LIST GROUP COMPONENTS ===== */
+.list-group-item {
+    background-color: var(--color-dark-lighter);
+    border-color: var(--color-dark-border);
+    color: var(--text-white);
+}
+
+.list-group-item:hover {
+    background-color: var(--color-dark-elevated);
+}
+
+/* Light mode list group */
+[data-theme="light"] .list-group-item {
+    background-color: var(--bg-white);
+    border-color: var(--color-dark-border);
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .list-group-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+/* ===== BG-LIGHT UTILITY CLASS ===== */
+.card.bg-light {
+    background-color: var(--color-dark-elevated) !important;
+    border-color: var(--color-dark-border);
+}
+
+.card.bg-light .card-body {
+    color: var(--text-white);
+}
+
+/* Light mode bg-light */
+[data-theme="light"] .card.bg-light {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--color-dark-border);
+}
+
+[data-theme="light"] .card.bg-light .card-body {
+    color: var(--text-primary);
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Icon sizes */
+.icon-xl {
+    font-size: 8rem;
+}
+
+.icon-lg {
+    font-size: 3rem;
+}
+
+.icon-md {
+    font-size: 2rem;
+}
+
+.icon-sm {
+    font-size: 1.5rem;
+}
+
+/* Sticky positioning */
+.sticky-sidebar {
+    position: sticky;
+    top: var(--spacing-xl);
+}
+
+/* Post image preview */
+.post-image-preview {
+    max-height: 300px;
+    object-fit: cover;
+}

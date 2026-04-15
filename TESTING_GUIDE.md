@@ -1,5 +1,40 @@
 # TruePal.Api - Testing Guide
 
+## ⚠️ MANDATORY REQUIREMENT ⚠️
+
+> **Every new feature or bug fix MUST include tests.**
+> **No tests = No pull request approval = No merge.**
+
+### When Tests Are Required
+
+✅ **You MUST write tests when:**
+- Adding a new API endpoint
+- Adding a new service method
+- Adding a new repository method
+- Modifying existing business logic
+- Fixing a bug (add test that would have caught it)
+- Adding authentication/authorization logic
+- Adding validation rules
+
+❌ **Tests are NOT required for:**
+- CSS/styling changes only
+- Static content updates (images, text)
+- Documentation updates
+- Configuration file changes (appsettings.json)
+
+### Test Coverage Requirements
+
+| Layer | Required Tests |
+|-------|----------------|
+| **Controllers** | All endpoints (success + error cases) |
+| **Services** | All public methods + validation + error codes |
+| **Repositories** | CRUD operations (create, read, update, delete) |
+| **Authentication** | Token generation, validation, expiration |
+
+**Minimum per feature:** 3-5 tests covering success case, validation failure, and not found scenario.
+
+---
+
 ## The Golden Rule
 
 > **When you add or modify a feature, you MUST update tests.**
@@ -45,6 +80,10 @@ Mirror the source code structure:
 TruePal.Api.Tests/
 ├── Helpers/
 │   └── TestDbContext.cs           # In-memory SQLite setup
+├── Controllers/                    # API controller tests
+│   └── ApiPostsControllerTests.cs
+├── Authentication/                 # Auth & JWT tests
+│   └── JwtCookieAuthenticationTests.cs
 ├── Repositories/
 │   ├── UserRepositoryTests.cs
 │   └── PostRepositoryTests.cs
@@ -56,11 +95,102 @@ TruePal.Api.Tests/
 
 **File naming:** `{ClassBeingTested}Tests.cs`
 **Class naming:** `public class {ClassBeingTested}Tests`
-**Namespace:** matches folder path (`TruePal.Api.Tests.Repositories`, `TruePal.Api.Tests.Services`)
+**Namespace:** matches folder path (`TruePal.Api.Tests.Controllers`, `TruePal.Api.Tests.Services`)
 
 ---
 
 ## Test Template
+
+### Controller Tests (API)
+
+```csharp
+using FluentAssertions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
+using System.Security.Claims;
+using TruePal.Api.Controllers;
+using TruePal.Api.DTOs;
+using TruePal.Api.Tests.Helpers;
+
+namespace TruePal.Api.Tests.Controllers;
+
+public class ApiYourControllerTests : IDisposable
+{
+    private readonly TestDbContext _testDb;
+    private readonly ApiYourController _controller;
+
+    public ApiYourControllerTests()
+    {
+        _testDb = new TestDbContext();
+        var logger = NullLogger<ApiYourController>.Instance;
+        _controller = new ApiYourController(...dependencies, logger);
+    }
+
+    // Helper to mock authenticated user
+    private void SetupAuthenticatedUser(int userId)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Name, "testuser"),
+            new Claim(ClaimTypes.Email, "test@example.com")
+        };
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        var claimsPrincipal = new ClaimsPrincipal(identity);
+
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+        };
+    }
+
+    [Fact]
+    public async Task GetResource_ExistingId_ReturnsOk()
+    {
+        // Arrange
+        // ...
+
+        // Act
+        var result = await _controller.GetResource(id);
+
+        // Assert
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        var response = okResult.Value as YourResponse;
+        response.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task CreateResource_ValidData_ReturnsCreated()
+    {
+        // Arrange
+        SetupAuthenticatedUser(userId);
+        var dto = new CreateDto { ... };
+
+        // Act
+        var result = await _controller.CreateResource(dto);
+
+        // Assert
+        var createdResult = result.Should().BeOfType<CreatedAtActionResult>().Subject;
+        createdResult.StatusCode.Should().Be(201);
+    }
+
+    [Fact]
+    public async Task CreateResource_Unauthenticated_HandlesProperly()
+    {
+        // Arrange - No authentication
+        var dto = new CreateDto { ... };
+
+        // Act
+        var result = await _controller.CreateResource(dto);
+
+        // Assert - Verify proper error handling
+        result.Should().BeAssignableTo<IActionResult>();
+    }
+
+    public void Dispose() => _testDb.Dispose();
+}
+```
 
 ### Repository Tests
 
@@ -226,6 +356,20 @@ PostTest()             // Vague
 ---
 
 ## Minimum Test Coverage
+
+### Per API Controller Endpoint
+
+| Endpoint | Minimum Tests |
+|----------|---------------|
+| GET | Success (200) + Not Found (404) |
+| POST | Created (201) + Validation (400) + Unauthorized (401) |
+| PUT | Success (200) + Not Found (404) + Forbidden (403) |
+| DELETE | Success (204) + Not Found (404) + Forbidden (403) |
+
+**Authentication Tests:**
+- Unauthenticated requests
+- Invalid/expired tokens
+- Wrong user (authorization)
 
 ### Per Repository (CRUD)
 

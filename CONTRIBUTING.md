@@ -38,19 +38,49 @@ Key patterns to follow:
 
 ### 4. Write Tests
 
-Every feature must have tests. No exceptions.
+**Every feature MUST have tests. No exceptions.**
+
+**What requires tests:**
+- ✅ New API endpoints (all HTTP methods)
+- ✅ New service methods (business logic)
+- ✅ New repository methods (data access)
+- ✅ Bug fixes (test that would have caught the bug)
+- ✅ Authentication/authorization changes
+- ✅ Validation rule changes
+
+**What doesn't require tests:**
+- ❌ CSS/styling changes only
+- ❌ Static content updates
+- ❌ Documentation updates
 
 ```bash
 cd TruePal.Api.Tests
 dotnet test  # verify baseline passes first
 ```
 
-Then add your tests:
-- Repository tests in `Repositories/`
-- Service tests in `Services/`
+Then add your tests in the appropriate folder:
+- **Controllers/** - API endpoint tests (HTTP status codes, authentication)
+- **Services/** - Business logic tests (validation, error codes, success cases)
+- **Repositories/** - Data access tests (CRUD operations)
+- **Authentication/** - Auth/JWT/security tests
+
+**Test naming:** `MethodName_StateUnderTest_ExpectedBehavior`
+
+**Examples:**
+```csharp
+CreatePost_ValidData_ReturnsCreated()
+GetPost_NonExistentId_ReturnsNotFound()
+UpdatePost_WrongUser_ReturnsForbidden()
+```
+
+**Required patterns:**
 - Use FluentAssertions (`.Should().Be(...)`)
-- Use Arrange-Act-Assert pattern
+- Use Arrange-Act-Assert structure
 - Test error codes, not just error messages
+- Verify HTTP status codes for controllers
+- Mock authentication for protected endpoints
+
+See [TESTING_GUIDE.md](TESTING_GUIDE.md) for complete patterns and templates.
 
 ### 5. Verify Before Committing
 
@@ -112,11 +142,17 @@ Prefixes: `feat:` (new feature), `fix:` (bug fix), `refactor:`, `test:`, `docs:`
 - [ ] Follows [THEME_GUIDE.md](THEME_GUIDE.md)
 
 ### Tests
-- [ ] Tests added for new/modified features
+- [ ] **BLOCKING:** Tests added for ALL new/modified features
+- [ ] **BLOCKING:** Tests added for bug fixes (test that would have caught it)
+- [ ] Tests in correct subdirectory (`Controllers/`, `Services/`, `Repositories/`, `Authentication/`)
 - [ ] FluentAssertions used (not `Assert.X`)
-- [ ] Tests in correct subdirectory (`Repositories/` or `Services/`)
 - [ ] Error codes verified in failure tests
-- [ ] All tests pass (`dotnet test`)
+- [ ] HTTP status codes verified for controller tests
+- [ ] Authentication/authorization scenarios covered
+- [ ] All tests pass (`dotnet test`) with 0 failures
+- [ ] Test names follow `MethodName_StateUnderTest_ExpectedBehavior` pattern
+- [ ] Tests use Arrange-Act-Assert structure
+- [ ] No commented-out or skipped tests
 
 ### Build
 - [ ] `dotnet build` succeeds with 0 errors

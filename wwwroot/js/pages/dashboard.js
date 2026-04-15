@@ -138,14 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ===== CREATE POST BUTTON =====
-    const createPostBtn = document.querySelector('.btn-create-post');
-
-    if (createPostBtn) {
-        createPostBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            console.log('Create new post');
-            // Future: Open create post modal/page
-        });
-    }
+    // Create post functionality now handled by create-post-modal.js component
+    // Modal is triggered via data-bs-toggle="modal" data-bs-target="#createPostModal"
 
 });

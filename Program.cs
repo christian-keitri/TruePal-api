@@ -44,6 +44,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudience = jwt["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!))
     };
+
+    // Configure JWT to read from cookies for API calls from authenticated MVC pages
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // Check for token in Authorization header first (for API clients)
+            if (string.IsNullOrEmpty(context.Token))
+            {
+                // If not in header, check the AuthToken cookie (for MVC authenticated requests)
+                context.Token = context.Request.Cookies["AuthToken"];
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 var app = builder.Build();

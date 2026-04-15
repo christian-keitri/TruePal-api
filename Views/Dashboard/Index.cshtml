@@ -14,10 +14,15 @@
     </div>
 </div>
 
+<!-- Create Post Modal -->
+<partial name="Components/_CreatePostModal" />
+
 @section Styles {
     <link rel="stylesheet" href="~/css/pages/dashboard.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/components/modals.css" asp-append-version="true">
 }
 
 @section Scripts {
     <script type="module" src="~/js/pages/dashboard.js" asp-append-version="true"></script>
+    <script src="~/js/components/create-post-modal.js" asp-append-version="true"></script>
 }
