@@ -3,6 +3,18 @@
 ## Overview
 This document describes the scalable CSS and component architecture for TruePal.
 
+### 🌓 Dark Mode & Light Mode Support
+
+**All CSS must support both dark and light themes.** Users can toggle between themes using the navbar icon.
+
+**Key principles:**
+1. Use CSS variables from `theme.css` (never hardcode colors)
+2. Variables automatically adapt when theme changes
+3. Test your components in BOTH themes before committing
+4. Theme is controlled by `data-theme` attribute on `<html>` element
+
+**See [THEME_GUIDE.md](THEME_GUIDE.md) for complete theming documentation.**
+
 ## Directory Structure
 
 ```
@@ -89,7 +101,32 @@ TruePal.Api/
 1. **Single Responsibility**: Each CSS file should have one clear purpose
 2. **Component Isolation**: Components should not depend on each other
 3. **Use CSS Variables**: Reference theme variables instead of hardcoded values
-4. **Mobile-First**: Write base styles for mobile, use `@media` for desktop
+4. **Theme Support**: All components must work in dark AND light mode
+5. **Mobile-First**: Write base styles for mobile, use `@media` for desktop
+
+### Theme-Aware Development
+
+**Always use CSS variables for colors:**
+```css
+/* ✅ CORRECT - Adapts to theme */
+.component {
+    background: var(--color-dark);
+    color: var(--text-white);
+    border: 1px solid var(--color-primary-border);
+}
+
+/* ❌ WRONG - Hardcoded, breaks in light mode */
+.component {
+    background: #121212;
+    color: white;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+}
+```
+
+**Test in both themes:**
+1. Build your component
+2. Click theme toggle in navbar
+3. Verify it looks correct in both dark and light modes
 
 ### Creating New Components
 

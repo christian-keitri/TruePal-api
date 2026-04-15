@@ -62,6 +62,12 @@ dotnet build
 # Tests
 cd TruePal.Api.Tests && dotnet test
 # All tests must pass
+
+# Theme Testing (if UI changes)
+dotnet run
+# Open http://localhost:5087
+# Click theme toggle (moon/sun icon)
+# Verify your changes work in BOTH dark and light modes
 ```
 
 ### 6. Commit
@@ -96,6 +102,14 @@ Prefixes: `feat:` (new feature), `fix:` (bug fix), `refactor:`, `test:`, `docs:`
 - [ ] Ownership checked before mutations
 - [ ] `[Authorize]` on protected endpoints
 - [ ] `[ValidateAntiForgeryToken]` on MVC POST actions
+
+### UI/UX & Theming
+- [ ] All colors use CSS variables (no hardcoded colors)
+- [ ] Component tested in BOTH dark and light modes
+- [ ] Text is readable in both themes
+- [ ] No white-on-white or black-on-black issues
+- [ ] Follows [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)
+- [ ] Follows [THEME_GUIDE.md](THEME_GUIDE.md)
 
 ### Tests
 - [ ] Tests added for new/modified features

@@ -671,6 +671,73 @@ TokenValidationParameters = new TokenValidationParameters
 
 ## CSS & Component Rules
 
+### RULE 1: All UI Must Support Dark Mode AND Light Mode
+
+**Every CSS class, component, and page must work in both themes.**
+
+```css
+/* ❌ BAD - Hardcoded colors */
+.my-component {
+    background-color: #121212;  /* Breaks in light mode */
+    color: #FFFFFF;              /* Invisible in light mode */
+}
+
+/* ✅ GOOD - Theme-aware variables */
+.my-component {
+    background-color: var(--color-dark);  /* Adapts to theme */
+    color: var(--text-white);             /* Adapts to theme */
+}
+```
+
+**Testing requirement:**
+- Test your feature in BOTH dark and light modes
+- Click the theme toggle (moon/sun icon in navbar)
+- Verify text is readable and UI looks correct in both themes
+
+### RULE 2: Never Hardcode Colors - Use CSS Variables
+
+**All colors must use CSS variables from `theme.css`.**
+
+See [THEME_GUIDE.md](THEME_GUIDE.md) for complete variable list.
+
+```css
+/* ❌ NEVER */
+background: #FFC107;
+color: black;
+border: 1px solid #2A2A2A;
+
+/* ✅ ALWAYS */
+background: var(--color-primary);
+color: var(--text-white);
+border: 1px solid var(--color-dark-border);
+```
+
+### RULE 3: Use Theme-Specific Overrides When Needed
+
+When CSS variables aren't enough:
+
+```css
+/* Base (both themes) */
+.card {
+    background: var(--color-dark-lighter);
+    box-shadow: var(--shadow-md);
+}
+
+/* Light mode specific */
+[data-theme="light"] .card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark mode specific */
+[data-theme="dark"] .card {
+    box-shadow: 0 4px 16px rgba(255, 193, 7, 0.2);
+}
+```
+
+---
+
+## Legacy: CSS & Component Rules
+
 ### RULE 45: Follow Component-Based CSS Architecture
 
 ```

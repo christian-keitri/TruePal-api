@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +13,9 @@
     
     <!-- Theme CSS -->
     <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true">
+    
+    <!-- Theme Switcher (load early to prevent flash) -->
+    <script src="~/js/theme.js" asp-append-version="true"></script>
     
     <style>
         html, body {
@@ -269,6 +272,10 @@
                 <button class="trending-btn-nav" id="trending-btn" title="View Trending Posts" type="button">
                     <i class="bi bi-fire"></i>
                 </button>
+                <!-- Theme Toggle Button -->
+                <button class="trending-btn-nav" id="theme-toggle" title="Toggle Dark/Light Mode" type="button">
+                    <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+                </button>
             </div>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -288,6 +295,10 @@
                         <button class="trending-btn-nav" title="View Trending Posts" type="button">
                             <i class="bi bi-fire-fill"></i>
                             <span>Trending</span>
+                        </button>
+                        <!-- Mobile Theme Toggle -->
+                        <button class="trending-btn-nav" id="theme-toggle-mobile" title="Toggle Theme" type="button">
+                            <i class="bi bi-moon-stars-fill" id="theme-icon-mobile"></i>
                         </button>
                     </div>
                 </div>

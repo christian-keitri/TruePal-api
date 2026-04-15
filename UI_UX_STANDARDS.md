@@ -96,6 +96,41 @@ This document defines the mandatory UI/UX standards for TruePal.Api. Following t
 
 ---
 
+---
+
+### ✅ RULE 4: All Features Must Support Dark Mode AND Light Mode
+**Mandatory:** Every UI component, page, and feature must work correctly in both dark and light themes.
+
+**❌ BAD - Hardcoded colors**
+```css
+.my-card {
+    background: #1E1E1E;  /* ❌ Only works in dark mode */
+    color: white;         /* ❌ Invisible in light mode */
+}
+```
+
+**✅ GOOD - Theme-aware colors**
+```css
+.my-card {
+    background: var(--color-dark-lighter); /* ✅ Adapts to theme */
+    color: var(--text-white);              /* ✅ Adapts to theme */
+}
+```
+
+**Theme Testing Checklist:**
+1. Click the theme toggle in navbar (moon/sun icon)
+2. Verify your component looks correct in BOTH dark and light modes
+3. Check for text contrast and readability
+4. Ensure no hardcoded colors that break in one theme
+
+**Available themes:**
+- `[data-theme="dark"]` - Default
+- `[data-theme="light"]` - User toggleable
+
+**See:** [THEME_GUIDE.md](THEME_GUIDE.md) for complete variable list and theme-specific overrides.
+
+---
+
 ## 🔧 CSS Variables Usage
 
 ### ✅ RULE 4: Use Spacing Variables - No Hardcoded Pixel Values

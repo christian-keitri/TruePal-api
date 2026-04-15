@@ -1,7 +1,9 @@
 /* TruePal Theme - Professional Black & Yellow Scheme */
 /* Goldenrod & Jet Black - Clean, energetic, modern design */
+/* Supports Dark Mode (default) and Light Mode */
 
-:root {
+:root,
+[data-theme="dark"] {
     /* ===== COLOR PALETTE ===== */
 
     /* Primary Yellow - Goldenrod (#FFC107) */
@@ -165,7 +167,53 @@
     --transition-slow: 0.5s ease;
 }
 
+/* ===== LIGHT MODE THEME ===== */
+[data-theme="light"] {
+    /* Backgrounds - Inverted for light mode */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FAFAFA;
+    --bg-tertiary: #F5F5F5;
+    --bg-dark: #FFFFFF;
+    --bg-dark-elevated: #F5F5F5;
+    --bg-white: #FFFFFF;
+
+    /* Dark surfaces become light */
+    --color-dark: #FFFFFF;
+    --color-dark-lighter: #F5F5F5;
+    --color-dark-elevated: #F5F5F5;
+    --color-dark-border: #E0E0E0;
+
+    /* Text colors - Inverted */
+    --text-primary: #121212;
+    --text-secondary: #757575;
+    --text-muted: #9E9E9E;
+    --text-white: #121212;
+    --text-white-secondary: #757575;
+
+    /* Adjust primary colors for light background */
+    --color-primary-light: rgba(255, 193, 7, 0.1);
+    --color-primary-border-subtle: rgba(255, 193, 7, 0.15);
+    --color-primary-border: rgba(255, 193, 7, 0.3);
+
+    /* Shadows for light mode */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
 /* ===== GLOBAL DEFAULTS ===== */
+
+/* Smooth theme transitions */
+body,
+.navbar,
+input,
+textarea,
+button,
+.card,
+.modal-content {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
 
 h1,
 h2,
@@ -178,6 +226,38 @@ h6 {
 
 p {
     color: var(--text-white-secondary);
+}
+
+/* Light mode specific adjustments */
+[data-theme="light"] .navbar {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .navbar-search input,
+[data-theme="light"] .mobile-search-container input {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .navbar-search input::placeholder,
+[data-theme="light"] .mobile-search-container input::placeholder {
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .trending-btn-nav,
+[data-theme="light"] #theme-toggle,
+[data-theme="light"] #theme-toggle-mobile {
+    background: var(--bg-white);
+    border-color: var(--color-primary);
+}
+
+[data-theme="light"] .nav-link:hover {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="light"] footer {
+    background-color: var(--bg-white);
+    border-top: 3px solid var(--color-primary);
 }
 
 /* ===== UTILITY CLASSES ===== */
