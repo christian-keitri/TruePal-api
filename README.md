@@ -1,211 +1,142 @@
 # TruePal.Api
 
-A scalable ASP.NET Core web application using **MVC architecture** with Clean Architecture principles.
+A social platform API and web application built with ASP.NET Core 10, following Clean Architecture principles.
 
-## 🚀 Quick Start
-
-```bash
-# Run the application
-dotnet run
-
-# Open in browser
-# http://localhost:5000
-```
-
-## 📚 Documentation
-
-### 🚀 For Developers (Start Here)
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** ⭐ **NEW DEVELOPERS START HERE** - Development workflow and guidelines
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED READING** - 38 mandatory coding rules (includes testing)
-- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** ⭐ **TESTING REQUIRED** - Testing quick reference and templates
-- **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** ⭐ **REQUIRED READING** - 36 UI/UX design rules
-- **[UI_UX_QUICK_REFERENCE.md](UI_UX_QUICK_REFERENCE.md)** 📋 **QUICK REFERENCE** - Cheat sheet for common patterns
-
-### Getting Started
-- **[QUICKSTART.md](QUICKSTART.md)** - Run the app and test API endpoints
-- **[THEME_GUIDE.md](THEME_GUIDE.md)** - CSS variables and design system
-
-### Architecture Guides
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Overall architecture and design patterns
-- **[MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md)** - MVC folder structure and best practices
-- **[CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md)** - CSS organization and component system
-
-### Implementation Details
-- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - What changes were made and why
-- **[MVC_SUMMARY.md](MVC_SUMMARY.md)** - Summary of MVC migration
-- **[MVC_MIGRATION.md](MVC_MIGRATION.md)** - Complete migration guide from Razor Pages to MVC
-
-## 🏗️ Architecture Overview
-
-```
-┌─────────────────────────────────────┐
-│   MVC Controllers & Views           │ ← Presentation Layer
-├─────────────────────────────────────┤
-│    Services (IAuthService)          │ ← Business Logic Layer
-├─────────────────────────────────────┤
-│    Repositories (IUnitOfWork)       │ ← Data Access Layer
-├─────────────────────────────────────┤
-│    Database (SQLite)                │ ← Data Layer
-└─────────────────────────────────────┘
-```
-
-## 🎯 Features
-
-- ✅ **MVC Architecture** - Model-View-Controller pattern
-- ✅ **Clean Architecture** - Separation of concerns with Core/Application/Infrastructure layers
-- ✅ **Repository Pattern** - Abstracted data access
-- ✅ **Unit of Work** - Transaction management
-- ✅ **Result Pattern** - Type-safe error handling
-- ✅ **Comprehensive Testing** - xUnit tests for all CRUD operations (MANDATORY for all features)
-- ✅ **JWT Authentication** - Secure token-based auth
-- ✅ **Cookie-based Sessions** - HttpOnly secure cookies
-- ✅ **Input Validation** - Data annotations with client & server validation
-- ✅ **Global Error Handling** - Middleware-based exception handling
-- ✅ **Request Logging** - All requests logged
-- ✅ **Component-based CSS** - Scalable stylesheet architecture
-- ✅ **REST API** - JSON endpoints for mobile/SPA clients
-
-## 📁 Project Structure
-
-```
-TruePal.Api/
-├── Controllers/              # MVC & API Controllers
-│   ├── Base/                # BaseController with helpers
-│   ├── Auth/Dashboard/Profile/Home  # MVC Controllers
-│   └── ApiAuth/ApiPosts/ApiUsers    # REST API Controllers
-├── Views/                    # Razor Views (.cshtml)
-│   ├── Auth/Dashboard/Profile/Home  # Feature-based views
-│   TruePal.Api.Tests/       # ⭐ Test Project (xUnit)
-│   ├── Repositories/        # Repository tests
-│   ├── Services/            # Service tests
-│   └── Integration/         # End-to-end tests
-├── └── Shared/              # Layouts & components
-├── Core/                     # Domain layer
-│   ├── Common/              # Result pattern
-│   ├── Interfaces/          # Service & repository contracts
-│   └── Validators/          # Business validation
-├── Application/              # Business logic
-│   └── Services/            # Service implementations
-├── Infrastructure/           # External concerns
-│   ├── Middleware/          # Global middleware
-│   └── Repositories/        # Data access implementations
-├── Models/                   # Domain entities
-├── DTOs/                     # Data transfer objects
-├── Data/                     # DbContext
-└── wwwroot/                  # Static files
-    └── css/
-        ├── theme.css        # Global theme
-        ├── components/      # Reusable component styles
-        └── pages/           # Page-specific styles
-```
-
-## 🛣️ Routes
-
-### Web Routes (MVC)
-- `/` - Home page with interactive map
-- `/Auth/Login` - Login
-- `/Auth/Register` - Registration
-- `/Dashboard/Index` - User dashboard
-- `/Profile/Index` - User profile
-
-### API Routes (REST)
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login (returns JWT)
-- `GET /api/posts` - Get posts
-- `POST /api/posts` - Create post
-
-## 🔐 Security Features
-
-- ✅ Password hashing with BCrypt
-- ✅ JWT token validation with signature & expiration
-- ✅ HttpOnly, Secure, SameSite cookies
-- ✅ XSS protection with HTML escaping
-- ✅ CSRF protection with AntiForgeryToken
-- ✅ SQL injection prevention (EF Core parameterization)
-- ✅ Global exception handling (no error details leaked)
-
-## 🎨 Design System
-
-- **Primary Color**: Smokey Yellow (#c9a961)
-- **UI Framework**: Bootstrap 5.3.0
-- **Icons**: Bootstrap Icons
-- **Maps**: MapLibre GL JS (free, no API key)
-- **CSS Architecture**: Component-based with theme variables
-
-See [THEME_GUIDE.md](THEME_GUIDE.md) for complete design system documentation.
-
-## 🧪 Testing
-
-### Test API with curl
-
-**Register:**
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "john",
-    "email": "john@example.com",
-    "password": "securepass123"
-  }'
-```
-
-**Login:**
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "securepass123"
-  }'
-```
-
-## 🛠️ Technology Stack
-
-- **Framework**: ASP.NET Core 10.0
-- **Language**: C# 12
-- **Database**: SQLite (EF Core)
-- **Authentication**: JWT + Cookies
-- **Frontend**: Razor Views, Bootstrap 5, Vanilla JS
-- **Mapping**: MapLibre GL JS
-- **Validation**: Data Annotations + jQuery Validation
-
-## 📦 NuGet Packages
-
-- Microsoft.EntityFrameworkCore.Sqlite
-- Microsoft.AspNetCore.Authentication.JwtBearer
-- BCrypt.Net-Next
-- System.IdentityModel.Tokens.Jwt
-
-## 🚦 Development
+## Quick Start
 
 ```bash
 # Restore dependencies
 dotnet restore
 
-# Build
-dotnet build
+# Run migrations
+dotnet ef database update
 
-# Run
+# Run the application
 dotnet run
 
-# Run with hot reload
-dotnet watch run
-
-# Database migrations
-dotnet ef migrations add MigrationName
-dotnet ef database update
+# Run tests
+cd TruePal.Api.Tests && dotnet test
 ```
 
-## 📖 Learn More
-
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Deep dive into architecture patterns
-- [MVC_MIGRATION.md](MVC_MIGRATION.md) - Learn about the MVC migration
-- [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) - CSS organization best practices
-
-## 📝 License
-
-Private project - All rights reserved © 2026 TruePal
+**Access:**
+- Web UI: `https://localhost:5001/`
+- API: `https://localhost:5001/api/`
+- Swagger: `https://localhost:5001/openapi`
 
 ---
 
-**Built with ❤️ using ASP.NET Core MVC**
+## Architecture
+
+Clean Architecture with two presentation layers sharing the same backend:
+
+```
+Browser (MVC Views)  ──┐
+Mobile / SPA (API)   ──┤
+                        ▼
+                   Controllers
+                        │
+                   Services (business logic)
+                        │
+                   Repositories (data access via UnitOfWork)
+                        │
+                   SQLite Database
+```
+
+**Key patterns:** Repository + Unit of Work, Result Pattern with Error Codes, Dependency Injection, Response DTOs.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for full details.
+
+---
+
+## API Endpoints
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register (returns user) |
+| POST | `/api/auth/login` | Login (returns JWT token) |
+
+### Posts
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/posts/{id}` | - | Get post by ID |
+| GET | `/api/posts/recent?count=10` | - | Recent posts feed |
+| GET | `/api/posts/trending?count=10` | - | Trending posts |
+| GET | `/api/posts/user/{userId}` | - | Posts by user |
+| POST | `/api/posts` | JWT | Create post |
+| PUT | `/api/posts/{id}` | JWT | Update post (owner only) |
+| DELETE | `/api/posts/{id}` | JWT | Delete post (owner only) |
+| POST | `/api/posts/{id}/views` | - | Track view |
+
+### Web Pages
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page with trending posts |
+| `/Auth/Login` | Login form |
+| `/Auth/Register` | Registration form |
+| `/Dashboard` | User dashboard (authenticated) |
+| `/Profile` | User profile (authenticated) |
+
+---
+
+## Project Structure
+
+```
+TruePal.Api/
+├── Controllers/          # MVC + API controllers
+├── Application/Services/ # Business logic
+├── Core/                 # Interfaces, Result<T>, validators
+├── Infrastructure/       # Repositories, middleware, UnitOfWork
+├── Models/               # Domain entities (User, Post)
+├── DTOs/                 # Request/response objects
+├── Data/                 # EF Core DbContext
+├── Views/                # Razor views
+├── wwwroot/              # Static assets (CSS, JS, images)
+├── Migrations/           # Database migrations
+└── TruePal.Api.Tests/    # Unit tests
+```
+
+---
+
+## Technology Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Framework | ASP.NET Core 10 |
+| Database | SQLite + EF Core 10 |
+| Auth | JWT Bearer + BCrypt |
+| Frontend | Razor + Bootstrap 5 |
+| Testing | xUnit + FluentAssertions |
+
+---
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture, data flow, patterns |
+| [CODING_STANDARDS.md](CODING_STANDARDS.md) | 57 mandatory development rules |
+| [TESTING_GUIDE.md](TESTING_GUIDE.md) | Testing patterns, FluentAssertions, coverage |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Development workflow, PR checklist |
+| [QUICKSTART.md](QUICKSTART.md) | Setup guide with API examples |
+| [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) | CSS organization and components |
+| [THEME_GUIDE.md](THEME_GUIDE.md) | Design tokens and CSS variables |
+| [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md) | UI/UX design rules |
+| [JS_ARCHITECTURE.md](JS_ARCHITECTURE.md) | JavaScript module organization |
+| [COLOR_PALETTE.md](COLOR_PALETTE.md) | Color system reference |
+
+---
+
+## Security
+
+- Passwords hashed with BCrypt (never stored in plain text)
+- JWT tokens with full claim validation (issuer, audience, lifetime, signing key)
+- HttpOnly + Secure + SameSite=Strict cookies
+- CSRF protection on MVC forms (`[ValidateAntiForgeryToken]`)
+- Global exception middleware prevents internal details from leaking
+- User input escaped in JavaScript rendering
+- Ownership verification on all mutations (update/delete)
+
+---
+
+**Last Updated:** April 15, 2026

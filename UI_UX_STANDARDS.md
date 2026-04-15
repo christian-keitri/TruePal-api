@@ -27,7 +27,7 @@ This document defines the mandatory UI/UX standards for TruePal.Api. Following t
 **❌ BAD - Hardcoded values**
 ```css
 .my-component {
-    background-color: #c9a961; /* ❌ Hardcoded */
+    background-color: #FFC107; /* ❌ Hardcoded */
     padding: 16px;
     border-radius: 8px;
     color: #333;
@@ -37,7 +37,7 @@ This document defines the mandatory UI/UX standards for TruePal.Api. Following t
 **✅ GOOD - CSS variables**
 ```css
 .my-component {
-    background-color: var(--primary-yellow); /* ✅ Theme variable */
+    background-color: var(--color-primary); /* ✅ Theme variable */
     padding: var(--spacing-md);
     border-radius: var(--radius-md);
     color: var(--text-primary);
@@ -302,16 +302,20 @@ var(--shadow-xl)  /* Hero elements */
 ## 🎨 Color Usage Rules
 
 ### ✅ RULE 13: Use Brand Colors Consistently
-**Primary Yellow (`var(--primary-yellow)`):**
+**Primary Goldenrod (`var(--color-primary)` / `#FFC107`):**
 - ✅ Buttons (primary actions)
 - ✅ Icons (brand elements)
 - ✅ Links (hover states)
-- ✅ Highlights
+- ✅ Highlights and accents
 
-**❌ Don't Use For:**
-- ❌ Large background areas
-- ❌ Body text
-- ❌ Accessibility-critical text
+**Jet Black (`var(--color-dark)` / `#121212`):**
+- ✅ Page backgrounds (dark theme)
+- ✅ Card backgrounds (`var(--color-dark-lighter)` / `#1E1E1E`)
+
+**❌ Don't Use Primary Yellow For:**
+- ❌ Large background areas (use dark tones instead)
+- ❌ Body text (use `var(--text-white)` on dark or `var(--text-primary)` on light)
+- ❌ Low-contrast text pairings
 
 ---
 
@@ -343,21 +347,28 @@ var(--shadow-xl)  /* Hero elements */
 **❌ BAD - Poor contrast**
 ```css
 .card {
-    background: #c9a961; /* Yellow */
-    color: #ffffff;      /* White - insufficient contrast */
+    background: #FFC107; /* Yellow */
+    color: #ffffff;      /* White on yellow - insufficient contrast */
 }
 ```
 
 **✅ GOOD - Good contrast**
 ```css
+/* Dark theme (default) */
 .card {
+    background: var(--color-dark-lighter); /* Charcoal #1E1E1E */
+    color: var(--text-white);              /* White on dark */
+}
+
+/* Light surfaces */
+.card-light {
     background: var(--bg-white);
-    color: var(--text-primary); /* Dark gray on white */
+    color: var(--text-primary); /* Jet Black on white */
 }
 
 .btn-primary {
-    background: var(--primary-yellow);
-    color: #000; /* Black on yellow (high contrast) */
+    background: var(--color-primary); /* Goldenrod */
+    color: #000;                      /* Black on yellow (high contrast) */
 }
 ```
 
@@ -624,7 +635,7 @@ var(--shadow-xl)  /* Hero elements */
 }
 
 a:hover {
-    color: var(--primary-yellow-dark);
+    color: var(--color-primary-dark);
     text-decoration: underline;
 }
 ```
@@ -689,7 +700,7 @@ a,
 a:focus,
 button:focus,
 input:focus {
-    outline: 2px solid var(--primary-yellow);
+    outline: 2px solid var(--color-primary);
     outline-offset: 2px;
 }
 ```
@@ -843,6 +854,5 @@ When creating a new component, verify:
 
 ---
 
-**Last Updated:** April 13, 2026  
-**Version:** 1.0  
-**Maintained by:** TruePal Design Team
+**Last Updated:** April 15, 2026
+**Version:** 2.0

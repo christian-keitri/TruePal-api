@@ -30,7 +30,7 @@ TruePal.Api/
 ### 1. Theme Layer (`theme.css`)
 **Purpose**: Global design system  
 **Contains**:
-- CSS custom properties (--primary-yellow, --spacing-md, etc.)
+- CSS custom properties (--color-primary, --spacing-md, etc.)
 - Utility classes (.text-primary, .m-lg, etc.)
 - Global component overrides (cards, buttons, forms)
 - Shared avatar and flex-card base styles

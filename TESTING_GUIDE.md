@@ -1,385 +1,284 @@
-# TruePal.Api - Testing Quick Reference
+# TruePal.Api - Testing Guide
 
-## 🎯 The Golden Rule
+## The Golden Rule
 
-> **When you add or modify a feature, you MUST update tests.**  
-> **No exceptions. No excuses. Tests are non-negotiable.**
-
----
-
-## ⚡ Quick Start
-
-### Before You Start Coding
-```bash
-# Navigate to test project
-cd TruePal.Api.Tests
-
-# Run existing tests to ensure clean baseline
-dotnet test
-
-# ✅ All tests should pass
-```
-
-### After You Code
-```bash
-# Create/update tests in appropriate folder
-# - Repositories/ for data layer
-# - Services/ for business logic
-# - Integration/ for end-to-end tests
-
-# Run tests again
-dotnet test
-
-# ✅ All tests must pass before committing
-```
-
----
-
-## 📝 Test Template
-
-Copy this template for new tests:
-
-```csharp
-using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using TruePal.Api.Data;
-using TruePal.Api.Infrastructure.Repositories;
-using TruePal.Api.Models;
-
-namespace TruePal.Api.Tests.Repositories;
-
-public class YourFeatureRepositoryTests : IDisposable
-{
-    private readonly AppDbContext _context;
-    private readonly YourFeatureRepository _repository;
-
-    public YourFeatureRepositoryTests()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-
-        _context = new AppDbContext(options);
-        _repository = new YourFeatureRepository(_context);
-    }
-
-    [Fact]
-    public async Task MethodName_ShouldSucceed_WhenValidDataProvided()
-    {
-        // Arrange - Set up test data
-        var entity = new YourEntity
-        {
-            Property = "value"
-        };
-
-        // Act - Execute the method
-        await _repository.AddAsync(entity);
-        await _context.SaveChangesAsync();
-
-        // Assert - Verify expected outcome
-        entity.Id.Should().BeGreaterThan(0);
-    }
-
-    [Fact]
-    public async Task MethodName_ShouldFail_WhenInvalidDataProvided()
-    {
-        // Arrange
-        var invalidEntity = new YourEntity { /* invalid data */ };
-
-        // Act
-        var result = await _repository.GetByIdAsync(999);
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
-        _context.Dispose();
-    }
-}
-```
-
----
-
-## ✅ Minimum Test Requirements
-
-### For Each CRUD Operation:
-
-**CREATE (Add new entity)**
-- ✅ Success case with valid data
-- ✅ ID auto-generation test
-- ✅ Validation failure test (if applicable)
-
-**READ (Get entity)**
-- ✅ Get by ID when exists
-- ✅ Get by ID when not exists (returns null)
-- ✅ Get all entities
-- ✅ Filter/search tests (if applicable)
-
-**UPDATE (Modify entity)**
-- ✅ Update with valid changes
-- ✅ Preserve non-updated fields
-- ✅ Validation tests
-
-**DELETE (Remove entity)**
-- ✅ Delete existing entity
-- ✅ Verify entity removed
-- ✅ Other entities not affected
-
----
-
-## 📐 Test Naming Convention
-
-**Format:** `MethodName_ExpectedBehavior_StateUnderTest`
-
-### ✅ Good Examples:
-```csharp
-CreateUser_ShouldSucceed_WhenValidDataProvided
-GetUserByEmail_ShouldReturnNull_WhenEmailNotFound
-UpdateProfile_ShouldPreserveCreatedAt_WhenUpdating
-DeleteUser_ShouldRemoveUser_WhenUserExists
-ValidatePassword_ShouldFail_WhenPasswordTooShort
-```
-
-### ❌ Bad Examples:
-```csharp
-TestCreateUser()      // Not descriptive
-Test1()               // Meaningless
-UserTest()            // Vague
-CreateUserTest()      // Doesn't specify outcome
-```
-
----
-
-## 🧪 Arrange-Act-Assert Pattern
-
-**Every test should follow this structure:**
-
-```csharp
-[Fact]
-public async Task ExampleTest()
-{
-    // ARRANGE - Set up test data and dependencies
-    var user = new User
-    {
-        Username = "testuser",
-        Email = "test@example.com"
-    };
-    await _repository.AddAsync(user);
-    await _context.SaveChangesAsync();
-
-    // ACT - Execute the method being tested
-    var result = await _repository.GetByEmailAsync("test@example.com");
-
-    // ASSERT - Verify the expected outcome  
-    result.Should().NotBeNull();
-    result!.Username.Should().Be("testuser");
-}
-```
-
----
-
-## 💎 FluentAssertions Cheat Sheet
-
-### Common Assertions:
-
-```csharp
-// Null checks
-result.Should().NotBeNull();
-result.Should().BeNull();
-
-// Equality
-result.Should().Be(expectedValue);
-result.Should().NotBe(unexpectedValue);
-
-// Strings
-result.Title.Should().Be("Expected Title");
-result.Name.Should().Contain("substring");
-result.Email.Should().StartWith("test");
-
-// Numbers
-result.Count.Should().BeGreaterThan(0);
-result.Id.Should().BeLessThan(100);
-result.Age.Should().BeInRange(18, 65);
-
-// Booleans
-result.IsActive.Should().BeTrue();
-result.IsDeleted.Should().BeFalse();
-
-// Collections
-result.Should().HaveCount(3);
-result.Should().Contain(item);
-result.Should().NotContain(unwantedItem);
-result.Should().ContainSingle(x => x.Id == 1);
-
-// Types
-result.Should().BeOfType<User>();
-result.Should().BeAssignableTo<IUser>();
-
-// Result<T> Pattern
-result.IsSuccess.Should().BeTrue();
-result.IsSuccess.Should().BeFalse();
-result.Errors.Should().Contain("Expected error message");
-```
-
----
-
-## 🚫 Common Mistakes to Avoid
-
-### ❌ DON'T: Share database context between tests
-```csharp
-// BAD - Tests will interfere with each other
-public class BadTests
-{
-    private static AppDbContext _context; // ❌ Static shared context
-}
-```
-
-### ✅ DO: Create fresh context for each test class
-```csharp
-// GOOD - Isolated tests
-public class GoodTests : IDisposable
-{
-    private readonly AppDbContext _context; // ✅ Instance per test class
-    
-    public GoodTests()
-    {
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // ✅ Unique DB
-            .Options;
-        _context = new AppDbContext(options);
-    }
-    
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted(); // ✅ Clean up
-        _context.Dispose();
-    }
-}
-```
-
-### ❌ DON'T: Test multiple things in one test
-```csharp
-[Fact]
-public async Task TestEverything() // ❌ Too broad
-{
-    await CreateUser();
-    await UpdateUser();
-    await DeleteUser();
-}
-```
-
-### ✅ DO: One test per behavior
-```csharp
-[Fact]
-public async Task CreateUser_ShouldSucceed() { } // ✅ Focused
-
-[Fact]
-public async Task UpdateUser_ShouldSucceed() { } // ✅ Focused
-
-[Fact]
-public async Task DeleteUser_ShouldSucceed() { } // ✅ Focused
-```
-
----
-
-## 🎯 Pre-Commit Checklist
-
-Before committing code:
-
-```bash
-# 1. Build succeeds
-dotnet build
-# ✅ No errors
-
-# 2. All tests pass
-cd TruePal.Api.Tests
-dotnet test
-# ✅ All green
-
-# 3. New tests added for new features
-# ✅ Verify new test files created
-
-# 4. Test coverage adequate
-# ✅ Minimum requirements met (see main standards)
-```
-
-**If ANY test fails → DO NOT COMMIT**
-
----
-
-## 📊 Test Organization
-
-```
-TruePal.Api.Tests/
-├── Repositories/           # Data layer tests
-│   ├── UserRepositoryTests.cs
-│   └── PostRepositoryTests.cs
-├── Services/              # Business logic tests
-│   ├── AuthServiceTests.cs
-│   └── PostServiceTests.cs
-├── Integration/           # End-to-end tests
-│   ├── UserIntegrationTests.cs
-│   └── PostIntegrationTests.cs
-└── README.md             # Test documentation
-```
-
-**File Naming:** `{ClassBeingTested}Tests.cs`
-
----
-
-## 🔍 Running Specific Tests
-
-```bash
-# Run all tests
-dotnet test
-
-# Run tests in specific file
-dotnet test --filter "FullyQualifiedName~UserRepositoryTests"
-
-# Run specific test
-dotnet test --filter "FullyQualifiedName~CreateUser_ShouldSucceed"
-
-# Run with verbose output
-dotnet test --verbosity detailed
-
-# Run tests matching pattern
-dotnet test --filter "DisplayName~Create"
-```
-
----
-
-## 💡 Pro Tips
-
-1. **Write tests first** (TDD) - Helps clarify requirements
-2. **Test edge cases** - Empty strings, null values, boundary conditions
-3. **Use descriptive test names** - Should read like documentation
-4. **Keep tests simple** - One assertion concept per test
-5. **Don't test framework code** - Focus on YOUR logic
-6. **Mock external dependencies** - Database, APIs, file system
-7. **Run tests frequently** - Catch issues early
-
----
-
-## 🚨 Remember
-
-> **Code without tests is broken by design.**  
-> **Tests are not optional. They are required.**  
+> **When you add or modify a feature, you MUST update tests.**
 > **No tests = No merge.**
 
 ---
 
-## 📚 References
+## Quick Start
 
-- Full Testing Rules: [CODING_STANDARDS.md - Rules 27-34](CODING_STANDARDS.md#testing-requirements)
-- Test Examples: [TruePal.Api.Tests/README.md](TruePal.Api.Tests/README.md)
-- xUnit Documentation: https://xunit.net/
-- FluentAssertions Documentation: https://fluentassertions.com/
+```bash
+# Run all tests
+cd TruePal.Api.Tests
+dotnet test
+
+# Run specific test class
+dotnet test --filter "FullyQualifiedName~PostServiceTests"
+
+# Run specific test
+dotnet test --filter "FullyQualifiedName~CreatePostAsync_ReturnsSuccess"
+
+# Verbose output
+dotnet test --verbosity detailed
+```
 
 ---
 
-**Questions?** Check [CODING_STANDARDS.md](CODING_STANDARDS.md) or ask the team.
+## Test Stack
 
-**Last Updated:** April 13, 2026
+| Tool | Purpose |
+|------|---------|
+| xUnit | Test framework |
+| FluentAssertions | Readable assertion syntax |
+| In-memory SQLite | Test database isolation |
+| NullLogger | Suppress log output in tests |
+
+---
+
+## Test File Organization
+
+Mirror the source code structure:
+
+```
+TruePal.Api.Tests/
+├── Helpers/
+│   └── TestDbContext.cs           # In-memory SQLite setup
+├── Repositories/
+│   ├── UserRepositoryTests.cs
+│   └── PostRepositoryTests.cs
+├── Services/
+│   ├── AuthServiceTests.cs
+│   └── PostServiceTests.cs
+└── TruePal.Api.Tests.csproj
+```
+
+**File naming:** `{ClassBeingTested}Tests.cs`
+**Class naming:** `public class {ClassBeingTested}Tests`
+**Namespace:** matches folder path (`TruePal.Api.Tests.Repositories`, `TruePal.Api.Tests.Services`)
+
+---
+
+## Test Template
+
+### Repository Tests
+
+```csharp
+using FluentAssertions;
+using TruePal.Api.Infrastructure.Repositories;
+using TruePal.Api.Models;
+using TruePal.Api.Tests.Helpers;
+
+namespace TruePal.Api.Tests.Repositories;
+
+public class YourEntityRepositoryTests : IDisposable
+{
+    private readonly TestDbContext _testDb;
+    private readonly YourEntityRepository _repository;
+
+    public YourEntityRepositoryTests()
+    {
+        _testDb = new TestDbContext();
+        _repository = new YourEntityRepository(_testDb.Context);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ExistingEntity_ReturnsEntity()
+    {
+        // Arrange
+        var entity = new YourEntity { Name = "Test" };
+        await _testDb.Context.YourEntities.AddAsync(entity);
+        await _testDb.Context.SaveChangesAsync();
+
+        // Act
+        var result = await _repository.GetByIdAsync(entity.Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.Name.Should().Be("Test");
+    }
+
+    public void Dispose() => _testDb.Dispose();
+}
+```
+
+### Service Tests
+
+```csharp
+using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
+using TruePal.Api.Application.Services;
+using TruePal.Api.Core.Interfaces;
+using TruePal.Api.Infrastructure;
+using TruePal.Api.Models;
+using TruePal.Api.Tests.Helpers;
+
+namespace TruePal.Api.Tests.Services;
+
+public class YourServiceTests : IDisposable
+{
+    private readonly TestDbContext _testDb;
+    private readonly UnitOfWork _unitOfWork;
+    private readonly YourService _service;
+
+    public YourServiceTests()
+    {
+        _testDb = new TestDbContext();
+        _unitOfWork = new UnitOfWork(_testDb.Context);
+        _service = new YourService(_unitOfWork, NullLogger<YourService>.Instance);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ValidInput_ReturnsSuccess()
+    {
+        // Arrange
+        // ...
+
+        // Act
+        var result = await _service.CreateAsync(...);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Data.Should().NotBeNull();
+    }
+
+    public void Dispose()
+    {
+        _unitOfWork.Dispose();
+        _testDb.Dispose();
+    }
+}
+```
+
+---
+
+## FluentAssertions Cheat Sheet
+
+### Basics
+```csharp
+result.Should().NotBeNull();
+result.Should().BeNull();
+result.Should().Be(expectedValue);
+result.Should().NotBe(unexpectedValue);
+```
+
+### Booleans
+```csharp
+result.IsSuccess.Should().BeTrue();
+result.IsSuccess.Should().BeFalse();
+```
+
+### Strings
+```csharp
+result.Content.Should().Be("Expected");
+result.Error.Should().Contain("not found");
+result.Email.Should().StartWith("test");
+```
+
+### Numbers
+```csharp
+result.Id.Should().BeGreaterThan(0);
+result.Count.Should().Be(3);
+result.ViewsCount.Should().BeInRange(1, 100);
+```
+
+### Collections
+```csharp
+result.Should().HaveCount(3);
+result.Should().BeEmpty();
+result.Should().OnlyContain(p => p.UserId == userId);
+result.First().Content.Should().Be("Expected");
+```
+
+### Result Pattern
+```csharp
+result.IsSuccess.Should().BeTrue();
+result.Data.Should().NotBeNull();
+result.Data!.Content.Should().Be("Expected");
+
+result.IsSuccess.Should().BeFalse();
+result.Error.Should().Be("Post not found");
+result.ErrorCode.Should().Be(ErrorCodes.NotFound);
+result.Errors.Should().Contain("Content is required");
+```
+
+---
+
+## Test Naming Convention
+
+**Format:** `MethodName_ExpectedBehavior_StateUnderTest`
+
+```csharp
+// Good
+CreatePostAsync_ReturnsSuccess_WhenValidInput()
+GetPostByIdAsync_ReturnsNotFound_WhenPostDoesNotExist()
+UpdatePostAsync_ReturnsForbidden_WhenWrongUser()
+DeletePostAsync_RemovesPost_WhenOwnerDeletes()
+IncrementViewsAsync_IncrementsCount_WhenPostExists()
+
+// Bad
+TestCreatePost()       // Not descriptive
+Test1()                // Meaningless
+PostTest()             // Vague
+```
+
+---
+
+## Minimum Test Coverage
+
+### Per Repository (CRUD)
+
+| Operation | Minimum Tests |
+|-----------|---------------|
+| CREATE | Success case + ID auto-generated |
+| READ | Exists + not exists + list all |
+| UPDATE | Success + preserves unchanged fields |
+| DELETE | Success + verify removed |
+
+### Per Service
+
+| Category | Minimum Tests |
+|----------|---------------|
+| Success path | At least 1 per method |
+| Validation failure | Empty input, too long, invalid format |
+| Authorization | Wrong user (FORBIDDEN) |
+| Not found | Non-existent resource (NOT_FOUND) |
+| Error codes | Verify correct ErrorCode on each failure |
+| Edge cases | Null optionals, boundary values |
+
+---
+
+## Rules
+
+1. **Use FluentAssertions** - not `Assert.Equal` / `Assert.True`
+2. **One behavior per test** - don't test create + update + delete in one method
+3. **Arrange-Act-Assert** - every test follows this structure
+4. **Isolated databases** - each test class gets its own `TestDbContext`
+5. **Test error codes** - verify `ErrorCode` matches, not just error messages
+6. **No shared state** - tests must not depend on execution order
+7. **No commented-out tests** - remove or fix, never comment out
+8. **Run before committing** - `dotnet test` must pass, always
+
+---
+
+## Pre-Commit Checklist
+
+```bash
+# 1. Build
+dotnet build
+# Must succeed with 0 errors
+
+# 2. Tests
+cd TruePal.Api.Tests && dotnet test
+# Must show: Test Run Successful
+
+# 3. New tests exist for new features
+# Verify in Repositories/ or Services/ directories
+
+# If ANY test fails -> DO NOT COMMIT
+```
+
+---
+
+**Last Updated:** April 15, 2026

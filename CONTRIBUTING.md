@@ -1,314 +1,169 @@
 # Contributing to TruePal.Api
 
-## 🎯 Before You Start
+## Required Reading
 
-**MANDATORY READING:**
-1. **[CODING_STANDARDS.md](CODING_STANDARDS.md)** - Code quality rules
-2. **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** - Design and UI rules
-
-All contributions must follow the established coding standards and design patterns.
+Before writing any code:
+1. [CODING_STANDARDS.md](CODING_STANDARDS.md) - 57 mandatory rules
+2. [ARCHITECTURE.md](ARCHITECTURE.md) - System design and patterns
+3. [TESTING_GUIDE.md](TESTING_GUIDE.md) - Test requirements
 
 ---
 
-## 🚦 Development Workflow
+## Development Workflow
 
-### 1. Setup Your Environment
+### 1. Setup
+
 ```bash
-# Clone the repository
-git clone [repository-url]
-
-# Restore dependencies
 dotnet restore
-
-# Run the application
+dotnet ef database update
 dotnet run
 ```
 
-### 2. Read the Documentation
-- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** ⭐ **REQUIRED** - Development rules (30 rules)
-- **[UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)** ⭐ **REQUIRED** - Design rules (36 rules)
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Understanding the architecture
-- **[MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md)** - MVC patterns
+### 2. Create Feature Branch
 
-### 3. Follow the Patterns
-✅ **Use existing reusable code:**
-- Inherit from `BaseController`
-- Use `Result<T>` pattern for service methods
-- Access database through `IUnitOfWork`
-- Use strongly-typed ViewModels
-- Use existing CSS components
-
-### 4. Create Your Feature Branch
 ```bash
 git checkout -b feature/your-feature-name
 ```
 
-### 5. Write Code Following Standards
-Refer to [CODING_STANDARDS.md](CODING_STANDARDS.md) for:
-- MVC patterns
-- Controller standards
-- Service layer rules
-- Repository patterns
-- Error handling
-- Validation
-- Security rules
-- Naming conventions
+### 3. Write Code Following Standards
 
-### 6. Write/Update Tests (MANDATORY)
-**⚠️ REQUIRED: All features MUST include tests**
+Key patterns to follow:
+- Access database through `IUnitOfWork` (never DbContext directly)
+- Services return `Result<T>` with `ErrorCodes` (never throw for business logic)
+- MVC controllers inherit `BaseController`; API controllers use `ControllerBase` + `[ApiController]`
+- Request DTOs have `[Required]`, `[StringLength]` annotations
+- Response DTOs have `FromModel()` factory methods (never expose domain models)
+- Try-catch in controllers, not services
+- Controllers use `MapError()` to route `ErrorCode` to HTTP status
+
+### 4. Write Tests
+
+Every feature must have tests. No exceptions.
 
 ```bash
-# Navigate to test project
 cd TruePal.Api.Tests
-
-# Run existing tests to ensure nothing broke
-dotnet test
-
-# Create tests for your new feature in appropriate folder:
-# - Repositories/ for repository tests
-# - Services/ for service tests  
-# - Integration/ for end-to-end tests
+dotnet test  # verify baseline passes first
 ```
 
-**Minimum Test Requirements:**
-- ✅ At least 1 test for success case
-- ✅ At least 1 test for failure/validation case
-- ✅ Follow Arrange-Act-Assert pattern
-- ✅ Use descriptive test names: `MethodName_ExpectedBehavior_StateUnderTest`
+Then add your tests:
+- Repository tests in `Repositories/`
+- Service tests in `Services/`
+- Use FluentAssertions (`.Should().Be(...)`)
+- Use Arrange-Act-Assert pattern
+- Test error codes, not just error messages
 
-**Example:**
-```csharp
-[Fact]
-public async Task CreateUser_ShouldSucceed_WhenValidDataProvided()
-{
-    // Arrange
-    var user = new User { Email = "test@example.com" };
-    
-    // Act
-    await _repository.AddAsync(user);
-    await _context.SaveChangesAsync();
-    
-    // Assert
-    user.Id.Should().BeGreaterThan(0);
-}
-```
+### 5. Verify Before Committing
 
-### 7. Test Your Changes
 ```bash
-# Run all tests (MANDATORY before commit)
-cd TruePal.Api.Tests
-dotnet test
-# ✅ All tests must pass
-
-# Build the project
-cd ../
+# Build
 dotnet build
+# 0 errors required
 
-# Run the application
-dotnet run
-
-# Manually test all affected pages
+# Tests
+cd TruePal.Api.Tests && dotnet test
+# All tests must pass
 ```
 
-### 8. Commit Your Changes
+### 6. Commit
+
 ```bash
 git add .
-git commit -m "feat: descriptive commit message"
+git commit -m "feat: descriptive message"
 ```
 
-**Commit Message Format:**
-- `feat:` New feature
-- `fix:` Bug fix
-- `refactor:` Code refactoring
-- `docs:` Documentation changes
-- `style:` Code style changes (formatting)
-- `test:` Adding tests
-
-### 9. Submit Pull Request
-Before submitting, verify:
-- [ ] **Tests Added/Updated** - MANDATORY for all features ⚠️
-- [ ] **All Tests Pass** - Run `dotnet test` successfully ⚠️
-- [ ] **Test Coverage** - Minimum requirements met (see CODING_STANDARDS.md Rule 28) ⚠️
-- [ ] Follows [CODING_STANDARDS.md](CODING_STANDARDS.md) (38 rules)
-- [ ] Follows [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md)
-- [ ] Uses existing reusable components
-- [ ] Builds without errors
-- [ ] All pages tested manually
-- [ ] Responsive on mobile (375px) to desktop (1920px)
-- [ ] No hardcoded CSS values (uses variables)
-- [ ] Accessible (WCAG AA compliant)
-- [ ] No exposed sensitive data
-- [ ] ViewModels are strongly-typed
-- [ ] Services return `Result<T>`
-- [ ] Controllers inherit from `BaseController`
+Prefixes: `feat:` (new feature), `fix:` (bug fix), `refactor:`, `test:`, `docs:`
 
 ---
 
-## 📋 Pull Request Checklist
+## Pull Request Checklist
 
-### Code Quality
-- [ ] Follows coding standards
-- [ ] Uses dependency injection
-- [ ] Proper error handling
-- [ ] Input validation implemented
-- [ ] No hardcoded values
-- [ ] Uses CSS variables from theme
+### Code
+- [ ] Follows [CODING_STANDARDS.md](CODING_STANDARDS.md)
+- [ ] Uses existing patterns (Result, UnitOfWork, DTOs)
+- [ ] No direct DbContext access (uses UnitOfWork)
+- [ ] Services return `Result<T>` with `ErrorCodes`
+- [ ] Controllers have try-catch and use `MapError()`
+- [ ] Response DTOs used (no anonymous objects or domain models in responses)
 
-### UI/UX Quality
-- [ ] Responsive design (mobile 375px to desktop 1920px)
-- [ ] Uses CSS variables (no hardcoded colors/spacing)
-- [ ] Bootstrap components used correctly
-- [ ] Proper hover/focus states
-- [ ] Accessible (ARIA labels, alt text, keyboard navigation)
-- [ ] Meets WCAG AA contrast requirements
-- [ ] Bootstrap Icons only (no mixed icon sets)
-- [ ] Mobile-first CSS approach
+### Validation
+- [ ] DTOs have data annotations
+- [ ] Service validates business rules
+- [ ] All validation errors returned at once
 
 ### Security
 - [ ] No passwords in plain text
-- [ ] User input escaped
-- [ ] Authentication checked
-- [ ] CSRF protection enabled
-- [ ] HttpOnly+Secure cookies
+- [ ] User input escaped where rendered
+- [ ] Ownership checked before mutations
+- [ ] `[Authorize]` on protected endpoints
+- [ ] `[ValidateAntiForgeryToken]` on MVC POST actions
 
-### Architecture
-- [ ] Controller inherits from BaseController
-- [ ] ViewModel defined in controller file
-- [ ] Service uses Result<T> pattern
-- [ ] Repository accessed via UnitOfWork
-- [ ] Follows MVC pattern
+### Tests
+- [ ] Tests added for new/modified features
+- [ ] FluentAssertions used (not `Assert.X`)
+- [ ] Tests in correct subdirectory (`Repositories/` or `Services/`)
+- [ ] Error codes verified in failure tests
+- [ ] All tests pass (`dotnet test`)
 
-### Documentation
-- [ ] Code comments where needed
-- [ ] README updated if needed
-- [ ] New components documented in CSS_ARCHITECTURE.md
+### Build
+- [ ] `dotnet build` succeeds with 0 errors
+- [ ] No new compiler warnings in changed files
 
 ---
 
-## 🚫 Common Mistakes to Avoid
+## Common Mistakes
 
-### ❌ Don't Use ViewData/ViewBag
+### Don't bypass the service layer
 ```csharp
-// ❌ BAD
-ViewData["Username"] = user.Username;
+// BAD - controller talks to repository
+var post = await _unitOfWork.Posts.GetByIdAsync(id);
 
-// ✅ GOOD
-var model = new ProfileViewModel { Username = user.Username };
-return View(model);
+// GOOD - controller talks to service
+var result = await _postService.GetPostByIdAsync(id);
 ```
 
-### ❌ Don't Inherit Directly from Controller
+### Don't match errors by string
 ```csharp
-// ❌ BAD
-public class PostsController : Controller
+// BAD
+if (result.Error.Contains("not found")) return NotFound();
 
-// ✅ GOOD
-public class PostsController : BaseController
+// GOOD
+return result.ErrorCode switch {
+    ErrorCodes.NotFound => NotFound(new { error = result.Error }),
+    ...
+};
 ```
 
-### ❌ Don't Access DbContext Directly
+### Don't use anonymous objects in responses
 ```csharp
-// ❌ BAD
-_context.Posts.Add(post);
+// BAD - duplicated everywhere, drifts
+return Ok(new { id = post.Id, content = post.Content, ... });
 
-// ✅ GOOD
-await _unitOfWork.Posts.AddAsync(post);
+// GOOD - single source of truth
+return Ok(PostResponse.FromPost(post));
 ```
 
-### ❌ Don't Throw Exceptions for Business Logic
+### Don't skip error codes
 ```csharp
-// ❌ BAD
-if (exists) throw new Exception("User exists");
+// BAD - controller can't distinguish 404 from 403
+return Result<Post>.Failure("Post not found");
 
-// ✅ GOOD
-if (exists) return Result<User>.Failure("User already exists");
-```
-
-### ❌ Don't Use Inline Styles
-```html
-<!-- ❌ BAD -->
-<div style="padding: 20px;">
-
-<!-- ✅ GOOD -->
-<div class="flex-card">
+// GOOD
+return Result<Post>.Failure("Post not found", ErrorCodes.NotFound);
 ```
 
 ---
 
-## 🆘 Getting Help
+## Code Review Process
 
-### Documentation Resources
-1. [CODING_STANDARDS.md](CODING_STANDARDS.md) - Code quality rules
-2. [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md) - Design and UI rules
-3. [ARCHITECTURE.md](ARCHITECTURE.md) - Architecture overview
-4. [MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md) - MVC patterns
-5. [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) - CSS organization
-6. [THEME_GUIDE.md](THEME_GUIDE.md) - CSS variables reference
+PRs are reviewed for:
+1. **Standards compliance** (blocking)
+2. **Security** (blocking)
+3. **Test coverage** (blocking)
+4. **Architecture** (blocking)
+5. **Performance** (advisory)
 
-### Questions?
-- Check existing documentation first
-- Review similar existing code
-- Ask the team lead
+PRs that violate coding standards or lack tests are rejected.
 
 ---
 
-## 🎓 Learning Path for New Developers
-
-### Week 1: Understanding
-1. Read [README.md](README.md)
-2. Read [QUICKSTART.md](QUICKSTART.md)
-3. Run the application
-4. Explore existing features
-
-### Week 2: Architecture
-1. Read [ARCHITECTURE.md](ARCHITECTURE.md)
-2. Read [MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md)
-3. Study existing controllers
-4. Understand Result pattern
-
-### Week 3: Standards
-1. Read [CODING_STANDARDS.md](CODING_STANDARDS.md) thoroughly
-2. Read [UI_UX_STANDARDS.md](UI_UX_STANDARDS.md) thoroughly
-3. Review all coding rules (30 rules)
-4. Review all UI/UX rules (36 rules)
-5. Study code examples
-6. Practice with small changes
-
-### Week 4: Contributing
-1. Pick a small feature
-2. Follow coding standards
-3. Submit first PR
-4. Iterate based on feedback
-
----
-
-## 📝 Code Review Process
-
-All PRs will be reviewed for:
-1. **Adherence to coding standards** (blocking)
-2. **Security vulnerabilities** (blocking)
-3. **Architecture compliance** (blocking)
-4. **Performance issues** (advisory)
-5. **Code quality** (advisory)
-
-**Reviewers will reject PRs that violate [CODING_STANDARDS.md](CODING_STANDARDS.md).**
-
----
-
-## ✅ Definition of Done
-
-A feature is "done" when:
-- [ ] Code follows all coding standards
-- [ ] Uses existing reusable components
-- [ ] Builds without errors or warnings
-- [ ] Manually tested and working
-- [ ] Security review passed
-- [ ] Code review approved
-- [ ] Documentation updated
-- [ ] Merged to main branch
-
----
-
-**Thank you for contributing to TruePal.Api!** 🎉
-
-By following these guidelines, you help maintain a high-quality, consistent, and maintainable codebase.
+**Last Updated:** April 15, 2026

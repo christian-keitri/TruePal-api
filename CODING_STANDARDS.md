@@ -1,159 +1,155 @@
-# TruePal.Api - Coding Standards & Development Rules
+# TruePal.Api - Coding Standards
 
-## 🎯 Purpose
-This document defines the mandatory coding patterns and reusable components for TruePal.Api development. Following these rules ensures consistency, maintainability, and leverages the established architecture.
+## Purpose
+
+Mandatory coding patterns for TruePal.Api. All pull requests must comply. Non-compliance results in PR rejection.
 
 ---
 
-## 📋 Table of Contents
-1. [MVC Pattern Rules](#mvc-pattern-rules)
-2. [Controller Standards](#controller-standards)
-3. [View Standards](#view-standards)
+## Table of Contents
+
+1. [Architecture Rules](#architecture-rules)
+2. [MVC Controller Standards](#mvc-controller-standards)
+3. [API Controller Standards](#api-controller-standards)
 4. [Service Layer Rules](#service-layer-rules)
 5. [Repository Pattern Rules](#repository-pattern-rules)
 6. [Error Handling Rules](#error-handling-rules)
 7. [Validation Rules](#validation-rules)
-8. [CSS & Component Rules](#css--component-rules)
-9. [Security Rules](#security-rules)
-10. [Testing Requirements](#testing-requirements)
-11. [Naming Conventions](#naming-conventions)
+8. [Scalability Rules](#scalability-rules)
+9. [Reliability Rules](#reliability-rules)
+10. [API Design & UX Rules](#api-design--ux-rules)
+11. [Security Rules](#security-rules)
+12. [CSS & Component Rules](#css--component-rules)
+13. [Testing Requirements](#testing-requirements)
+14. [Naming Conventions](#naming-conventions)
 
 ---
 
-## 🏗️ MVC Pattern Rules
+## Architecture Rules
 
-### ✅ RULE 1: Always Use Strongly-Typed ViewModels
-**❌ BAD - ViewData (Type-unsafe)**
+### RULE 1: Follow Clean Architecture Layers
+
+All code must reside in its designated layer. Never bypass layers.
+
+```
+Controllers/         -> Receives requests, delegates to services, returns responses
+Application/Services -> Business logic, validation, orchestration
+Core/Interfaces      -> Contracts (IPostService, IPostRepository, Result<T>)
+Core/Validators      -> Reusable validation helpers
+Infrastructure/      -> Database access (repositories), middleware
+Models/              -> Domain entities
+DTOs/                -> Request/response data transfer objects
+```
+
+**Never** let a controller access a repository directly. Always go through a service.
+
+### RULE 2: All Dependencies Must Use Interfaces
+
 ```csharp
-// Controller
+// BAD - concrete dependency
+private readonly PostService _postService;
+
+// GOOD - interface dependency
+private readonly IPostService _postService;
+```
+
+Register in `Program.cs`:
+```csharp
+builder.Services.AddScoped<IPostService, PostService>();
+```
+
+### RULE 3: Use the Result Pattern for All Service Returns
+
+Services never throw exceptions for business logic. They return `Result<T>`.
+
+```csharp
+public async Task<Result<Post>> CreatePostAsync(...)
+{
+    if (invalid)
+        return Result<Post>.Failure("Reason", ErrorCodes.Validation);
+
+    return Result<Post>.Success(post);
+}
+```
+
+### RULE 4: Use Error Codes on All Failure Results
+
+Every `Result.Failure()` call must include an `ErrorCode` so controllers can map to the correct HTTP status without string matching.
+
+```csharp
+// Defined in Core/Common/Result.cs
+public static class ErrorCodes
+{
+    public const string NotFound = "NOT_FOUND";
+    public const string Forbidden = "FORBIDDEN";
+    public const string Validation = "VALIDATION";
+}
+
+// Usage in services
+return Result<Post>.Failure("Post not found", ErrorCodes.NotFound);
+return Result<Post>.Failure("Not authorized", ErrorCodes.Forbidden);
+return Result<Post>.Failure(validationErrors); // auto-tagged VALIDATION
+```
+
+### RULE 5: Access Database Only Through UnitOfWork
+
+```csharp
+// BAD
+_context.Posts.Add(post);
+await _context.SaveChangesAsync();
+
+// GOOD
+await _unitOfWork.Posts.AddAsync(post);
+await _unitOfWork.CompleteAsync();
+```
+
+### RULE 6: Repositories Must Extend the Generic Base
+
+```csharp
+public interface IPostRepository : IRepository<Post>
+{
+    Task<IEnumerable<Post>> GetByUserIdAsync(int userId);
+}
+
+public class PostRepository : Repository<Post>, IPostRepository
+{
+    public PostRepository(AppDbContext context) : base(context) { }
+}
+```
+
+This inherits `GetByIdAsync`, `GetAllAsync`, `AddAsync`, `Update`, `Delete`, `FindAsync`, `AnyAsync`.
+
+---
+
+## MVC Controller Standards
+
+### RULE 7: MVC Controllers Inherit from BaseController
+
+```csharp
+public class PostsController : BaseController
+{
+    public PostsController(IConfiguration configuration, ILogger<PostsController> logger)
+        : base(logger, configuration) { }
+}
+```
+
+This provides: `SetSuccess()`, `SetError()`, `SetInfo()`, `SetWarning()`, `RedirectToActionWithSuccess()`, `AddErrors()`, `LogAndDisplayError()`.
+
+### RULE 8: Use Strongly-Typed ViewModels
+
+```csharp
+// BAD
 ViewData["Username"] = user.Username;
-ViewData["Email"] = user.Email;
 
-// View
-var username = ViewData["Username"] as string ?? "";
-```
-
-**✅ GOOD - ViewModel (Type-safe)**
-```csharp
-// Controller
-var model = new ProfileViewModel 
-{
-    Username = user.Username,
-    Email = user.Email
-};
+// GOOD
+var model = new ProfileViewModel { Username = user.Username };
 return View(model);
-
-// View
-@model ProfileViewModel
-<h1>@Model.Username</h1>
 ```
 
-**Why:** Type safety, IntelliSense, compile-time checking, refactoring support.
+Define ViewModels at the bottom of controller files in a `#region ViewModels` block.
 
----
+### RULE 9: Use ValidateAntiForgeryToken on All MVC POST Actions
 
-### ✅ RULE 2: Define ViewModels in Controller Files
-**Location:** At the bottom of controller files in a `#region ViewModels` block
-
-**✅ CORRECT Structure:**
-```csharp
-namespace TruePal.Api.Controllers;
-
-public class PostsController : BaseController
-{
-    // Controller actions here
-}
-
-#region ViewModels
-
-public class CreatePostViewModel
-{
-    [Required]
-    [StringLength(100)]
-    public string Title { get; set; } = string.Empty;
-}
-
-#endregion
-```
-
-**Why:** Co-location keeps related code together, easier to find and maintain.
-
----
-
-### ✅ RULE 3: All Controllers Must Inherit from BaseController
-**❌ BAD**
-```csharp
-public class PostsController : Controller
-{
-    private readonly ILogger<PostsController> _logger;
-    
-    public PostsController(ILogger<PostsController> logger)
-    {
-        _logger = logger;
-    }
-}
-```
-
-**✅ GOOD**
-```csharp
-public class PostsController : BaseController
-{
-    public PostsController(IConfiguration configuration, ILogger<PostsController> logger) 
-        : base(logger, configuration)
-    {
-    }
-}
-```
-
-**Why:** Access to helper methods (SetSuccess, SetError, LogAndDisplayError), consistent logging, configuration access.
-
----
-
-## 🎛️ Controller Standards
-
-### ✅ RULE 4: Use BaseController Helper Methods
-**Available Methods:**
-- `SetSuccess(string message)` - Success message via TempData
-- `SetError(string message)` - Error message via TempData
-- `SetInfo(string message)` - Info message via TempData
-- `RedirectToActionWithSuccess(action, controller, message)` - Redirect with success
-- `AddErrors(List<string> errors)` - Add multiple errors to ModelState
-- `LogAndDisplayError(message, exception)` - Log and show user-friendly error
-
-**❌ BAD**
-```csharp
-TempData["SuccessMessage"] = "Post created!";
-return RedirectToAction("Index");
-```
-
-**✅ GOOD**
-```csharp
-return RedirectToActionWithSuccess("Index", "Posts", "Post created successfully!");
-```
-
----
-
-### ✅ RULE 5: Always Check Authentication Before Accessing Protected Resources
-**✅ REQUIRED Pattern:**
-```csharp
-public IActionResult Index()
-{
-    // First: Check authentication
-    if (!Request.Cookies.ContainsKey("AuthToken"))
-    {
-        return RedirectToActionWithError("Login", "Auth", "Please login to continue");
-    }
-    
-    // Then: Load data and return view
-    var model = new DashboardViewModel { ... };
-    return View(model);
-}
-```
-
----
-
-### ✅ RULE 6: Use ValidateAntiForgeryToken for All POST Actions
-**✅ REQUIRED:**
 ```csharp
 [HttpPost]
 [ValidateAntiForgeryToken]
@@ -161,69 +157,546 @@ public async Task<IActionResult> Create(CreatePostViewModel model)
 {
     if (!ModelState.IsValid)
         return View(model);
-    
-    // Process...
+    // ...
 }
 ```
 
-**Why:** Prevents CSRF attacks.
+### RULE 10: Check Authentication Before Protected Resources
 
----
+```csharp
+if (!Request.Cookies.ContainsKey("AuthToken"))
+{
+    return RedirectToActionWithError("Login", "Auth", "Please login to continue");
+}
+```
 
-## 👁️ View Standards
+### RULE 11: Try-Catch in MVC Controllers, Not Services
 
-### ✅ RULE 7: Always Declare @model At Top of View
-**✅ REQUIRED:**
-```cshtml
-@model CreatePostViewModel
-@{
-    ViewData["Title"] = "Create Post";
+```csharp
+// Controller
+try
+{
+    var result = await _postService.CreatePostAsync(model);
+    if (!result.IsSuccess)
+    {
+        AddErrors(result.Errors);
+        return View(model);
+    }
+    return RedirectToActionWithSuccess("Index", "Posts", "Post created!");
+}
+catch (Exception ex)
+{
+    LogAndDisplayError("Failed to create post", ex);
+    return View(model);
 }
 
-<h1>Create New Post</h1>
+// Service - returns Result, no try-catch
+public async Task<Result<Post>> CreatePostAsync(...)
+{
+    // business logic only
+}
 ```
 
 ---
 
-### ✅ RULE 8: Use Reusable Partial Components
-**Available Partials:**
-- `<partial name="Components/_MapOverlay" />` - Map header overlay
-- `<partial name="Components/_AuthOverlay" />` - Auth call-to-action
-- `<partial name="Components/_PostsPanel" />` - Posts slide-out panel
-- `<partial name="_StatusMessages" />` - Success/Error/Info messages
+## API Controller Standards
 
-**✅ ALWAYS Include in Layouts:**
-```cshtml
-@* In _Layout.cshtml or views *@
-<partial name="_StatusMessages" />
+### RULE 12: API Controllers Inherit from ControllerBase
+
+API controllers use `[ApiController]` with `ControllerBase`, not `BaseController` (which is for MVC views).
+
+```csharp
+[ApiController]
+[Route("api/posts")]
+public class ApiPostsController : ControllerBase
+{
+    private readonly IPostService _postService;
+    private readonly ILogger<ApiPostsController> _logger;
+
+    public ApiPostsController(IPostService postService, ILogger<ApiPostsController> logger)
+    {
+        _postService = postService;
+        _logger = logger;
+    }
+}
 ```
 
-**Why:** Displays messages from TempData (SetSuccess, SetError, etc.).
+### RULE 13: Use MapError for Consistent Error Responses
+
+Every API controller must include a `MapError` helper that routes `ErrorCode` to HTTP status:
+
+```csharp
+private IActionResult MapError(string? error, string? errorCode, List<string>? errors = null)
+{
+    if (errors != null && errors.Count > 0)
+        return BadRequest(new { errors });
+
+    return errorCode switch
+    {
+        ErrorCodes.NotFound => NotFound(new { error }),
+        ErrorCodes.Forbidden => StatusCode(403, new { error }),
+        ErrorCodes.Validation => BadRequest(new { error }),
+        _ => BadRequest(new { error })
+    };
+}
+```
+
+**Never** use `Forbid()` in API controllers (returns empty body). Use `StatusCode(403, new { error })`.
+
+### RULE 14: Try-Catch in API Controllers
+
+```csharp
+[HttpGet("{id}")]
+public async Task<IActionResult> GetPost(int id)
+{
+    try
+    {
+        var result = await _postService.GetPostByIdAsync(id);
+        if (!result.IsSuccess)
+            return MapError(result.Error!, result.ErrorCode);
+
+        return Ok(PostResponse.FromPost(result.Data!));
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error retrieving post {PostId}", id);
+        return StatusCode(500, new { error = "An error occurred while retrieving the post" });
+    }
+}
+```
+
+### RULE 15: Extract Repeated Claim Parsing into Helpers
+
+```csharp
+private bool TryGetUserId(out int userId)
+{
+    userId = 0;
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    return userIdClaim != null && int.TryParse(userIdClaim.Value, out userId);
+}
+```
+
+### RULE 16: Use Response DTOs, Never Expose Domain Models
+
+```csharp
+// BAD - leaks internal structure
+return Ok(post);
+
+// BAD - duplicated anonymous objects
+return Ok(new { id = post.Id, content = post.Content, ... });
+
+// GOOD - dedicated response DTO
+return Ok(PostResponse.FromPost(post));
+```
+
+Response DTOs live in `DTOs/` with a static `FromModel()` factory method:
+
+```csharp
+public class PostResponse
+{
+    public int Id { get; set; }
+    public string Content { get; set; } = string.Empty;
+    // ...
+
+    public static PostResponse FromPost(Post post, bool includeTrendingScore = false)
+    {
+        return new PostResponse { Id = post.Id, Content = post.Content, ... };
+    }
+}
+```
 
 ---
 
-### ✅ RULE 9: Use Component CSS Classes, Not Inline Styles
-**❌ BAD**
-```html
-<div style="background: yellow; padding: 20px;">...</div>
+## Service Layer Rules
+
+### RULE 17: Services Return Result, No Try-Catch
+
+Services contain business logic only. They return `Result<T>` for success/failure. Exception handling belongs in controllers and middleware.
+
+```csharp
+public async Task<Result<Post>> CreatePostAsync(int userId, string content, ...)
+{
+    var errors = ValidatePostInput(content, location, imageUrl);
+    if (errors.Count > 0)
+        return Result<Post>.Failure(errors);
+
+    var user = await _unitOfWork.Users.GetByIdAsync(userId);
+    if (user == null)
+        return Result<Post>.Failure("User not found", ErrorCodes.NotFound);
+
+    var post = new Post { ... };
+    await _unitOfWork.Posts.AddAsync(post);
+    await _unitOfWork.CompleteAsync();
+
+    return Result<Post>.Success(post);
+}
 ```
 
-**✅ GOOD**
-```html
-<div class="flex-card">...</div>
+### RULE 18: Validate All Inputs in Service Layer
+
+Validate content length, field constraints, and business rules before touching the database. Return all errors at once, not one at a time.
+
+```csharp
+private static List<string> ValidatePostInput(string content, string? location, string? imageUrl)
+{
+    var errors = new List<string>();
+    if (string.IsNullOrWhiteSpace(content))
+        errors.Add("Post content is required");
+    else if (content.Length > 500)
+        errors.Add("Post content must be 500 characters or less");
+    if (location != null && location.Length > 200)
+        errors.Add("Location must be 200 characters or less");
+    if (imageUrl != null && imageUrl.Length > 500)
+        errors.Add("Image URL must be 500 characters or less");
+    return errors;
+}
 ```
 
-**Available Component Classes:**
-- `.flex-card` - Reusable card component
-- `.posts-panel` - Slide-out panel
-- `.overlay-content` - Overlay container
+### RULE 19: Enforce Ownership Before Mutations
 
-**See:** [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) for all available classes.
+Any update or delete must verify the requesting user owns the resource:
+
+```csharp
+if (post.UserId != userId)
+    return Result<Post>.Failure("You are not authorized to update this post", ErrorCodes.Forbidden);
+```
 
 ---
 
-### ✅ RULE 10: Load CSS Per-Page Using @section Styles
-**✅ REQUIRED Pattern:**
+## Repository Pattern Rules
+
+### RULE 20: Always Include Navigation Properties When Needed
+
+Use `.Include()` for related data. Never rely on lazy loading.
+
+```csharp
+public async Task<Post?> GetByIdWithUserAsync(int id)
+{
+    return await _dbSet
+        .Include(p => p.User)
+        .FirstOrDefaultAsync(p => p.Id == id);
+}
+```
+
+### RULE 21: Keep Computed Properties Aligned with Queries
+
+If a model has a `[NotMapped]` computed property used in API responses, its formula must match any repository ordering that uses the same concept.
+
+```csharp
+// Model
+[NotMapped]
+public double TrendingScore =>
+    (LikesCount * 2) + (CommentsCount * 3) + (ViewsCount * 0.5);
+
+// Repository - MUST use same formula
+.OrderByDescending(p => p.LikesCount * 2 + p.CommentsCount * 3 + p.ViewsCount * 0.5)
+```
+
+---
+
+## Error Handling Rules
+
+### RULE 22: Never Expose Raw Exception Messages
+
+```csharp
+// BAD
+catch (Exception ex) { return BadRequest(new { error = ex.Message }); }
+
+// GOOD
+catch (Exception ex)
+{
+    _logger.LogError(ex, "Error creating post");
+    return StatusCode(500, new { error = "An error occurred while creating the post" });
+}
+```
+
+### RULE 23: Never Route Errors by String Matching
+
+```csharp
+// BAD - fragile, breaks when message text changes
+if (result.Error.Contains("not found"))
+    return NotFound();
+
+// GOOD - typed error codes
+return result.ErrorCode switch
+{
+    ErrorCodes.NotFound => NotFound(new { error = result.Error }),
+    ErrorCodes.Forbidden => StatusCode(403, new { error = result.Error }),
+    _ => BadRequest(new { error = result.Error })
+};
+```
+
+### RULE 24: Global Exception Middleware as Safety Net
+
+`GlobalExceptionMiddleware` catches any unhandled exceptions. It is a safety net, not a substitute for proper error handling in controllers.
+
+---
+
+## Validation Rules
+
+### RULE 25: Use Data Annotations on All DTOs
+
+```csharp
+public class CreatePostDto
+{
+    [Required(ErrorMessage = "Content is required")]
+    [StringLength(500, MinimumLength = 1, ErrorMessage = "Content must be between 1 and 500 characters")]
+    public string Content { get; set; } = string.Empty;
+
+    [StringLength(200, ErrorMessage = "Location must be 200 characters or less")]
+    public string? Location { get; set; }
+}
+```
+
+### RULE 26: Validate at Both DTO and Service Layers
+
+- **DTO annotations** catch malformed requests before they reach the service (via `[ApiController]` auto-validation).
+- **Service validation** enforces business rules (user exists, ownership, uniqueness).
+
+Both layers are required. DTOs catch shape errors; services catch logic errors.
+
+### RULE 27: Return All Validation Errors at Once
+
+```csharp
+// BAD - user fixes one error, submits, gets another
+if (string.IsNullOrWhiteSpace(content))
+    return Result<Post>.Failure("Content required");
+
+// GOOD - user sees all problems at once
+var errors = new List<string>();
+if (string.IsNullOrWhiteSpace(content)) errors.Add("Content required");
+if (content.Length > 500) errors.Add("Content too long");
+return Result<Post>.Failure(errors);
+```
+
+---
+
+## Scalability Rules
+
+### RULE 28: Always Use Async/Await for I/O Operations
+
+Every database call, HTTP request, or file operation must be async. Method names must end with `Async`.
+
+```csharp
+// BAD
+public Post GetPostById(int id) => _context.Posts.Find(id);
+
+// GOOD
+public async Task<Post?> GetByIdAsync(int id) =>
+    await _dbSet.FindAsync(id);
+```
+
+### RULE 29: Paginate All List Endpoints
+
+Never return unbounded collections. All list endpoints must accept `count` (or `pageSize` + `page`) and enforce a maximum.
+
+```csharp
+// Service
+if (count <= 0 || count > 100)
+    return Result<IEnumerable<Post>>.Failure("Count must be between 1 and 100", ErrorCodes.Validation);
+
+// Repository
+return await _dbSet.OrderByDescending(p => p.CreatedAt).Take(count).ToListAsync();
+```
+
+### RULE 30: Prevent N+1 Queries
+
+Always `.Include()` required navigation properties in the repository query. Never access navigation properties that weren't loaded.
+
+```csharp
+// BAD - N+1: loads posts then hits DB for each post's user
+var posts = await _dbSet.ToListAsync();
+foreach (var p in posts) Console.Write(p.User.Username); // N queries
+
+// GOOD - single query with join
+var posts = await _dbSet.Include(p => p.User).ToListAsync();
+```
+
+### RULE 31: Use Scoped Lifetime for Database Dependencies
+
+Repositories, UnitOfWork, and DbContext must be registered as `Scoped` (one instance per request). Never use `Singleton` for database access.
+
+```csharp
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddDbContext<AppDbContext>(...);
+```
+
+---
+
+## Reliability Rules
+
+### RULE 32: GET Endpoints Must Be Idempotent
+
+GET requests must not modify state. Side effects (view counting, analytics) belong in separate POST endpoints.
+
+```csharp
+// BAD - GET modifies data
+[HttpGet("{id}")]
+public async Task<IActionResult> GetPost(int id)
+{
+    var post = await _postService.GetPostByIdAsync(id);
+    await _postService.IncrementViewsAsync(id); // side effect in GET
+    return Ok(post);
+}
+
+// GOOD - separate endpoint
+[HttpGet("{id}")]
+public async Task<IActionResult> GetPost(int id) { ... }
+
+[HttpPost("{id}/views")]
+public async Task<IActionResult> IncrementViews(int id) { ... }
+```
+
+### RULE 33: Use UnitOfWork for Atomic Operations
+
+When a service method performs multiple writes, they all go through the same UnitOfWork and a single `CompleteAsync()` call. If any step fails, nothing is committed.
+
+```csharp
+await _unitOfWork.Posts.AddAsync(post);
+await _unitOfWork.CompleteAsync(); // single commit
+```
+
+### RULE 34: Log All Service Operations
+
+Use structured logging with named parameters for operations that change state:
+
+```csharp
+_logger.LogInformation("Post {PostId} created by user {UserId}", post.Id, userId);
+_logger.LogError(ex, "Error creating post for user {UserId}", userId);
+```
+
+### RULE 35: Middleware Pipeline Order Matters
+
+The middleware pipeline must follow this order:
+1. `GlobalExceptionMiddleware` (catches everything)
+2. `RequestLoggingMiddleware` (logs timing)
+3. `UseHttpsRedirection()`
+4. `UseStaticFiles()`
+5. `UseAuthentication()`
+6. `UseAuthorization()`
+
+---
+
+## API Design & UX Rules
+
+### RULE 36: Consistent JSON Response Format
+
+**Success (single):** `{ "id": 1, "content": "...", "user": { ... } }`
+**Success (list):** `[{ "id": 1, ... }, { "id": 2, ... }]`
+**Error (single):** `{ "error": "Post not found" }`
+**Error (multiple):** `{ "errors": ["Content required", "Location too long"] }`
+**Server error:** `{ "error": "An error occurred while ..." }`
+
+### RULE 37: Use Correct HTTP Status Codes
+
+| Status | When |
+|--------|------|
+| 200 OK | Successful GET, PUT |
+| 201 Created | Successful POST (with `CreatedAtAction`) |
+| 204 No Content | Successful DELETE |
+| 400 Bad Request | Validation errors |
+| 401 Unauthorized | Missing or invalid auth token |
+| 403 Forbidden | Authenticated but not authorized (e.g., wrong owner) |
+| 404 Not Found | Resource does not exist |
+| 500 Internal Server Error | Unhandled exception |
+
+### RULE 38: Use CreatedAtAction for POST Responses
+
+```csharp
+return CreatedAtAction(
+    nameof(GetPost),
+    new { id = result.Data!.Id },
+    PostResponse.FromPost(result.Data));
+```
+
+This returns 201 with a `Location` header pointing to the new resource.
+
+### RULE 39: Use camelCase for All JSON Properties
+
+Response DTOs use PascalCase in C# but `System.Text.Json` auto-converts to camelCase. Never override this. API consumers expect `createdAt`, not `CreatedAt`.
+
+### RULE 40: Null Fields Should Be Omitted or Explicit
+
+Optional fields (like `trendingScore`) should be `null` when not applicable, not `0` or empty string. Use `[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]` or handle in the response DTO factory.
+
+---
+
+## Security Rules
+
+### RULE 41: HttpOnly Secure Cookies for Auth Tokens
+
+```csharp
+var cookieOptions = new CookieOptions
+{
+    HttpOnly = true,
+    Secure = true,
+    SameSite = SameSiteMode.Strict,
+    Expires = DateTimeOffset.UtcNow.AddMinutes(60)
+};
+Response.Cookies.Append("AuthToken", token, cookieOptions);
+```
+
+### RULE 42: Never Store Passwords in Plain Text
+
+Always use BCrypt:
+```csharp
+string hash = BCrypt.Net.BCrypt.HashPassword(password);
+bool valid = BCrypt.Net.BCrypt.Verify(password, hash);
+```
+
+### RULE 43: Escape User-Generated Content in JavaScript
+
+```javascript
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+```
+
+### RULE 44: JWT Tokens Must Validate All Claims
+
+```csharp
+TokenValidationParameters = new TokenValidationParameters
+{
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    // ...
+};
+```
+
+---
+
+## CSS & Component Rules
+
+### RULE 45: Follow Component-Based CSS Architecture
+
+```
+wwwroot/css/
+├── theme.css           # Global theme variables (always loaded)
+├── components/         # Reusable component styles
+│   ├── cards.css
+│   ├── panels.css
+│   └── overlays.css
+└── pages/              # Page-specific styles
+    ├── home.css
+    └── dashboard.css
+```
+
+### RULE 46: Use CSS Variables from Theme
+
+```css
+/* BAD */
+.card { background: #c9a961; padding: 16px; }
+
+/* GOOD */
+.card { background: var(--primary-yellow); padding: var(--spacing-md); }
+```
+
+### RULE 47: Load CSS Per-Page
+
 ```cshtml
 @section Styles {
     <link rel="stylesheet" href="~/css/components/cards.css" asp-append-version="true">
@@ -231,691 +704,199 @@ public async Task<IActionResult> Create(CreatePostViewModel model)
 }
 ```
 
-**Why:** Only load what's needed, faster page loads.
-
 ---
 
-## 🔧 Service Layer Rules
+## Testing Requirements
 
-### ✅ RULE 11: Always Use Result Pattern for Service Methods
-**❌ BAD - Exceptions for control flow**
+### RULE 48: All Features Must Include Tests
+
+No exceptions. PRs without tests are automatically rejected.
+
+### RULE 49: Use FluentAssertions
+
 ```csharp
-public async Task<User> CreateUserAsync(string email)
-{
-    if (await _userRepository.EmailExistsAsync(email))
-        throw new Exception("Email exists");
-    
-    return user;
-}
-```
-
-**✅ GOOD - Result Pattern**
-```csharp
-public async Task<Result<User>> CreateUserAsync(string email)
-{
-    if (await _userRepository.EmailExistsAsync(email))
-        return Result<User>.Failure("Email already exists");
-    
-    return Result<User>.Success(user);
-}
-```
-
-**Why:** Type-safe error handling, no exceptions for business logic, clearer intent.
-
----
-
-### ✅ RULE 12: Services Must Use Interfaces
-**❌ BAD - Concrete class**
-```csharp
-public class PostsController : BaseController
-{
-    private readonly PostService _postService; // ❌ Concrete
-}
-```
-
-**✅ GOOD - Interface**
-```csharp
-public class PostsController : BaseController
-{
-    private readonly IPostService _postService; // ✅ Interface
-}
-```
-
-**Why:** Testability, dependency inversion, loose coupling.
-
----
-
-### ✅ RULE 13: Use Dependency Injection for All Dependencies
-**✅ REQUIRED Pattern:**
-```csharp
-public class PostService : IPostService
-{
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<PostService> _logger;
-    
-    public PostService(IUnitOfWork unitOfWork, ILogger<PostService> logger)
-    {
-        _unitOfWork = unitOfWork;
-        _logger = logger;
-    }
-}
-```
-
-**Register in Program.cs:**
-```csharp
-builder.Services.AddScoped<IPostService, PostService>();
-```
-
----
-
-## 🗄️ Repository Pattern Rules
-
-### ✅ RULE 14: Always Access Database Through UnitOfWork
-**❌ BAD - Direct DbContext**
-```csharp
-public class PostService
-{
-    private readonly AppDbContext _context; // ❌ Direct access
-    
-    public async Task CreatePost(Post post)
-    {
-        _context.Posts.Add(post);
-        await _context.SaveChangesAsync();
-    }
-}
-```
-
-**✅ GOOD - UnitOfWork Pattern**
-```csharp
-public class PostService : IPostService
-{
-    private readonly IUnitOfWork _unitOfWork; // ✅ Through UnitOfWork
-    
-    public async Task<Result<Post>> CreatePostAsync(Post post)
-    {
-        await _unitOfWork.Posts.AddAsync(post);
-        await _unitOfWork.CompleteAsync();
-        return Result<Post>.Success(post);
-    }
-}
-```
-
-**Why:** Transaction management, atomic operations, abstraction.
-
----
-
-### ✅ RULE 15: Repositories Must Implement Generic IRepository<T>
-**✅ REQUIRED Pattern:**
-```csharp
-public interface IPostRepository : IRepository<Post>
-{
-    Task<IEnumerable<Post>> GetByUserIdAsync(int userId);
-    Task<bool> TitleExistsAsync(string title);
-}
-
-public class PostRepository : Repository<Post>, IPostRepository
-{
-    public PostRepository(AppDbContext context) : base(context) { }
-    
-    public async Task<IEnumerable<Post>> GetByUserIdAsync(int userId)
-    {
-        return await _context.Posts.Where(p => p.UserId == userId).ToListAsync();
-    }
-}
-```
-
-**Why:** Inherits common operations (GetByIdAsync, GetAllAsync, etc.), reduces code duplication.
-
----
-
-## ⚠️ Error Handling Rules
-
-### ✅ RULE 16: Never Expose Raw Exception Messages to Users
-**❌ BAD**
-```csharp
-catch (Exception ex)
-{
-    SetError(ex.Message); // ❌ Exposes internal details
-}
-```
-
-**✅ GOOD**
-```csharp
-catch (Exception ex)
-{
-    LogAndDisplayError("An error occurred while creating the post. Please try again.", ex);
-}
-```
-
-**Why:** Security, user experience, log details internally.
-
----
-
-### ✅ RULE 17: Use Try-Catch in Controllers, Not Services
-**✅ CORRECT Pattern:**
-```csharp
-// Controller
-public async Task<IActionResult> Create(CreatePostViewModel model)
-{
-    try
-    {
-        var result = await _postService.CreatePostAsync(model);
-        
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-            return View(model);
-        }
-        
-        return RedirectToActionWithSuccess("Index", "Posts", "Post created!");
-    }
-    catch (Exception ex)
-    {
-        LogAndDisplayError("Failed to create post", ex);
-        return View(model);
-    }
-}
-
-// Service - Returns Result, doesn't throw
-public async Task<Result<Post>> CreatePostAsync(CreatePostViewModel model)
-{
-    // Business logic, returns Result<Post>
-}
-```
-
----
-
-## ✔️ Validation Rules
-
-### ✅ RULE 18: Use Data Annotations for ViewModel Validation
-**✅ REQUIRED:**
-```csharp
-public class CreatePostViewModel
-{
-    [Required(ErrorMessage = "Title is required")]
-    [StringLength(100, MinimumLength = 5, ErrorMessage = "Title must be 5-100 characters")]
-    [Display(Name = "Post Title")]
-    public string Title { get; set; } = string.Empty;
-    
-    [Required(ErrorMessage = "Content is required")]
-    [StringLength(5000, MinimumLength = 10)]
-    [Display(Name = "Post Content")]
-    public string Content { get; set; } = string.Empty;
-}
-```
-
-**Why:** Client and server-side validation, clear error messages, reusable.
-
----
-
-### ✅ RULE 19: Always Check ModelState.IsValid
-**✅ REQUIRED Pattern:**
-```csharp
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Create(CreatePostViewModel model)
-{
-    if (!ModelState.IsValid)
-        return View(model); // ✅ Return view with validation errors
-    
-    // Process...
-}
-```
-
----
-
-### ✅ RULE 20: Include Validation Scripts in Views with Forms
-**✅ REQUIRED:**
-```cshtml
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
-```
-
-**Why:** Enables client-side validation (jQuery Validation).
-
----
-
-## 🎨 CSS & Component Rules
-
-### ✅ RULE 21: Follow Component-Based CSS Architecture
-**Structure:**
-```
-wwwroot/css/
-├── theme.css           # ✅ Global theme (always loaded)
-├── components/         # ✅ Reusable components
-│   ├── cards.css
-│   ├── panels.css
-│   └── overlays.css
-└── pages/              # ✅ Page-specific styles
-    ├── home.css
-    └── posts.css
-```
-
-**Loading Order:**
-1. `theme.css` - Always in _Layout.cshtml
-2. Component CSS - Per page as needed
-3. Page CSS - Per page
-
----
-
-### ✅ RULE 22: Use CSS Variables from Theme
-**❌ BAD**
-```css
-.my-card {
-    background: #c9a961; /* ❌ Hardcoded */
-    padding: 16px;
-}
-```
-
-**✅ GOOD**
-```css
-.my-card {
-    background: var(--primary-yellow); /* ✅ CSS variable */
-    padding: var(--spacing-md);
-}
-```
-
-**Available Variables:** See [THEME_GUIDE.md](THEME_GUIDE.md)
-
----
-
-### ✅ RULE 23: Create Reusable Components, Not Page-Specific Duplicates
-**If a component is used in 2+ places, make it reusable:**
-
-1. Create CSS in `wwwroot/css/components/`
-2. Create partial in `Views/Shared/Components/`
-3. Document in CSS_ARCHITECTURE.md
-
----
-
-## 🔐 Security Rules
-
-### ✅ RULE 24: Always Use HttpOnly, Secure Cookies for Authentication
-**✅ REQUIRED Pattern:**
-```csharp
-var cookieOptions = new CookieOptions
-{
-    HttpOnly = true,    // ✅ Prevents XSS access
-    Secure = true,      // ✅ HTTPS only
-    SameSite = SameSiteMode.Strict, // ✅ CSRF protection
-    Expires = DateTimeOffset.UtcNow.AddMinutes(60)
-};
-
-Response.Cookies.Append("AuthToken", token, cookieOptions);
-```
-
----
-
-### ✅ RULE 25: Always Escape User-Generated Content in JavaScript
-**❌ BAD**
-```javascript
-element.innerHTML = userInput; // ❌ XSS vulnerability
-```
-
-**✅ GOOD**
-```javascript
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-element.innerHTML = escapeHtml(userInput); // ✅ Safe
-```
-
----
-
-### ✅ RULE 26: Never Store Passwords in Plain Text
-**✅ REQUIRED: Use BCrypt**
-```csharp
-// Hash password
-string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-
-// Verify password
-bool isValid = BCrypt.Net.BCrypt.Verify(password, hashedPassword);
-```
-
----
-
-## 🧪 Testing Requirements
-
-### ✅ RULE 27: All Features MUST Include Tests
-**📌 MANDATORY - When you add or modify a feature, you MUST update tests.**
-
-**✅ REQUIRED Pattern:**
-```csharp
-// When you create a new service method:
-public async Task<Result<User>> CreateUserAsync(RegisterRequest request)
-{
-    // Implementation...
-}
-
-// You MUST create corresponding tests:
-[Fact]
-public async Task CreateUserAsync_ShouldCreateUser_WhenValidDataProvided()
-{
-    // Arrange
-    var request = new RegisterRequest
-    {
-        Email = "test@example.com",
-        Username = "testuser",
-        Password = "Password123!"
-    };
-
-    // Act
-    var result = await _userService.CreateUserAsync(request);
-
-    // Assert
-    result.IsSuccess.Should().BeTrue();
-    result.Value.Email.Should().Be("test@example.com");
-}
-```
-
-**Why:** Ensures code quality, prevents regressions, documents expected behavior, enables safe refactoring.
-
----
-
-### ✅ RULE 28: Test Coverage Requirements
-**MINIMUM Coverage for Each Feature:**
-
-**Repository/Data Layer:**
-- ✅ CREATE: At least 2 tests (success case, edge cases)
-- ✅ READ: At least 3 tests (exists, not exists, query filters)
-- ✅ UPDATE: At least 2 tests (success, validation failures)
-- ✅ DELETE: At least 2 tests (success, cascading effects)
-
-**Service Layer:**
-- ✅ Success path test
-- ✅ Validation failure tests
-- ✅ Business logic edge cases
-- ✅ Error handling tests
-
-**Example - Complete Coverage:**
-```csharp
-public class UserServiceTests
-{
-    // CREATE Tests
-    [Fact]
-    public async Task CreateUser_ShouldSucceed_WhenValidData() { }
-    
-    [Fact]
-    public async Task CreateUser_ShouldFail_WhenEmailExists() { }
-    
-    [Fact]
-    public async Task CreateUser_ShouldFail_WhenPasswordTooWeak() { }
-    
-    // READ Tests
-    [Fact]
-    public async Task GetUserById_ShouldReturnUser_WhenExists() { }
-    
-    [Fact]
-    public async Task GetUserById_ShouldReturnNull_WhenNotExists() { }
-    
-    // UPDATE Tests
-    [Fact]
-    public async Task UpdateUser_ShouldSucceed_WhenValidChanges() { }
-    
-    [Fact]
-    public async Task UpdateUser_ShouldPreserveCreatedDate() { }
-    
-    // DELETE Tests
-    [Fact]
-    public async Task DeleteUser_ShouldRemove_WhenExists() { }
-}
-```
-
----
-
-### ✅ RULE 29: Use Arrange-Act-Assert Pattern
-**✅ REQUIRED Test Structure:**
-```csharp
-[Fact]
-public async Task MethodName_ExpectedBehavior_StateUnderTest()
-{
-    // Arrange - Set up test data and dependencies
-    var user = new User
-    {
-        Username = "testuser",
-        Email = "test@example.com"
-    };
-    await _repository.AddAsync(user);
-    await _context.SaveChangesAsync();
-
-    // Act - Execute the method being tested
-    var result = await _repository.GetByEmailAsync("test@example.com");
-
-    // Assert - Verify the expected outcome
-    result.Should().NotBeNull();
-    result!.Username.Should().Be("testuser");
-}
-```
-
-**Why:** Clear test structure, easy to understand, maintainable.
-
----
-
-### ✅ RULE 30: Test Naming Convention
-**Format:** `MethodName_ExpectedBehavior_StateUnderTest`
-
-**✅ GOOD Examples:**
-```csharp
-CreateUserAsync_ShouldReturnSuccess_WhenValidDataProvided
-GetUserByEmail_ShouldReturnNull_WhenEmailNotFound
-UpdateUser_ShouldPreserveCreatedAt_WhenUpdatingProfile
-DeleteUser_ShouldRemoveUser_WhenUserExists
-ValidatePassword_ShouldReturnFalse_WhenPasswordIsTooShort
-```
-
-**❌ BAD Examples:**
-```csharp
-TestCreateUser()  // Not descriptive
-Test1()           // Meaningless
-UserTest()        // Vague
-```
-
----
-
-### ✅ RULE 31: Use FluentAssertions for Readable Tests
-**❌ BAD - Traditional Assert:**
-```csharp
+// BAD
 Assert.NotNull(result);
 Assert.Equal("test@example.com", result.Email);
 Assert.True(result.IsActive);
-```
 
-**✅ GOOD - FluentAssertions:**
-```csharp
+// GOOD
 result.Should().NotBeNull();
 result!.Email.Should().Be("test@example.com");
 result.IsActive.Should().BeTrue();
 ```
 
-**Why:** More readable, better error messages, chainable assertions.
+### RULE 50: Follow Arrange-Act-Assert Pattern
 
----
-
-### ✅ RULE 32: Isolate Tests with In-Memory Database
-**✅ REQUIRED Pattern:**
 ```csharp
-public class UserRepositoryTests : IDisposable
+[Fact]
+public async Task CreatePostAsync_ValidInput_ReturnsSuccess()
 {
-    private readonly AppDbContext _context;
-    private readonly UserRepository _repository;
+    // Arrange
+    var userId = _testUser.Id;
+    var content = "Test post";
 
-    public UserRepositoryTests()
-    {
-        // Create unique in-memory database for each test class
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
+    // Act
+    var result = await _postService.CreatePostAsync(userId, content, null, null);
 
-        _context = new AppDbContext(options);
-        _repository = new UserRepository(_context);
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
-        _context.Dispose();
-    }
+    // Assert
+    result.IsSuccess.Should().BeTrue();
+    result.Data!.Content.Should().Be(content);
 }
 ```
 
-**Why:** Test isolation, no external dependencies, fast execution, deterministic results.
+### RULE 51: Test Naming Convention
 
----
+Format: `MethodName_ExpectedBehavior_StateUnderTest`
 
-### ✅ RULE 33: Run Tests Before Committing
-**MANDATORY Before Every Commit:**
-```bash
-# Run all tests
-cd TruePal.Api.Tests
-dotnet test
-
-# Verify all tests pass
-# ✅ All tests must be green before committing
+```
+CreatePostAsync_ReturnsSuccess_WhenValidInput
+GetPostByIdAsync_ReturnsNotFound_WhenPostDoesNotExist
+DeletePostAsync_ReturnsForbidden_WhenWrongUser
 ```
 
-**Pull Request Requirements:**
-- [ ] All existing tests still pass
-- [ ] New tests added for new features
-- [ ] Test coverage meets minimum requirements
-- [ ] No commented-out or skipped tests without justification
+### RULE 52: Test File Organization
 
----
-
-### ✅ RULE 34: Test File Organization
-**Structure mirrors source code:**
+Mirror the source structure:
 ```
 TruePal.Api.Tests/
+├── Helpers/
+│   └── TestDbContext.cs
 ├── Repositories/
 │   ├── UserRepositoryTests.cs
 │   └── PostRepositoryTests.cs
-├── Services/
-│   ├── AuthServiceTests.cs
-│   └── PostServiceTests.cs
-└── Integration/
-    ├── UserIntegrationTests.cs
-    └── PostIntegrationTests.cs
+└── Services/
+    ├── AuthServiceTests.cs
+    └── PostServiceTests.cs
 ```
 
-**Naming Convention:**
-- Test file: `{ClassBeingTested}Tests.cs`
-- Test class: `public class {ClassBeingTested}Tests`
+### RULE 53: Minimum Test Coverage Per Feature
+
+**Repository:** CREATE (2 tests), READ (3 tests), UPDATE (2 tests), DELETE (2 tests)
+**Service:** Success path, validation failures, authorization checks, edge cases
+**Each error code path** must have at least one test.
+
+### RULE 54: Isolate Tests with In-Memory Database
+
+```csharp
+public class PostRepositoryTests : IDisposable
+{
+    private readonly TestDbContext _testDb;
+    private readonly PostRepository _repository;
+
+    public PostRepositoryTests()
+    {
+        _testDb = new TestDbContext(); // unique in-memory SQLite DB
+        _repository = new PostRepository(_testDb.Context);
+    }
+
+    public void Dispose() => _testDb.Dispose();
+}
+```
+
+### RULE 55: Test Error Codes, Not Just Messages
+
+```csharp
+// Verifies the controller will map to the correct HTTP status
+result.ErrorCode.Should().Be(ErrorCodes.NotFound);
+result.ErrorCode.Should().Be(ErrorCodes.Forbidden);
+```
 
 ---
 
-## 📛 Naming Conventions
+## Naming Conventions
 
-### ✅ RULE 35: Follow C# Naming Standards
+### RULE 56: C# Naming Standards
+
 | Type | Convention | Example |
 |------|-----------|---------|
 | Classes | PascalCase | `PostService`, `UserRepository` |
 | Interfaces | IPascalCase | `IPostService`, `IUserRepository` |
-| Methods | PascalCase | `CreatePostAsync`, `GetUserByIdAsync` |
+| Methods | PascalCase + Async | `CreatePostAsync`, `GetByIdAsync` |
 | Private fields | _camelCase | `_unitOfWork`, `_logger` |
 | Parameters | camelCase | `userId`, `postTitle` |
-| ViewModels | PascalCase + "ViewModel" | `CreatePostViewModel` |
+| ViewModels | PascalCase + ViewModel | `CreatePostViewModel` |
+| DTOs | PascalCase + Dto/Response | `CreatePostDto`, `PostResponse` |
+| Error Codes | UPPER_SNAKE | `NOT_FOUND`, `FORBIDDEN` |
 
----
+### RULE 57: File Organization
 
-### ✅ RULE 36: Async Method Naming
-**✅ All async methods must end with "Async":**
-```csharp
-public async Task<Result<Post>> CreatePostAsync(Post post)
-public async Task<User?> GetUserByIdAsync(int id)
-```
-
----
-
-### ✅ RULE 37: Controller Action Naming
-**Use HTTP verb naming:**
-```csharp
-[HttpGet]
-public IActionResult Create() { } // Shows form
-
-[HttpPost]
-public IActionResult Create(CreatePostViewModel model) { } // Processes form
-```
-
----
-
-### ✅ RULE 38: File Organization
-**Controllers:** `Controllers/FeatureController.cs`
 ```
 Controllers/
-├── AuthController.cs
-├── PostsController.cs
-├── ProfileController.cs
+├── Base/BaseController.cs           # MVC base class
+├── AuthController.cs                # MVC - Authentication
+├── DashboardController.cs           # MVC - Dashboard
+├── HomeController.cs                # MVC - Landing page
+├── ProfileController.cs             # MVC - Profile
+├── ApiAuthController.cs             # API - Authentication
+└── ApiPostsController.cs            # API - Posts
+
+Application/Services/
+├── AuthService.cs
+└── PostService.cs
+
+Core/
+├── Common/Result.cs                 # Result<T>, ErrorCodes
+├── Interfaces/                      # All interfaces
+└── Validators/                      # Validation helpers
+
+Infrastructure/
+├── Middleware/
+│   ├── GlobalExceptionMiddleware.cs
+│   └── RequestLoggingMiddleware.cs
+├── Repositories/
+│   ├── Repository.cs                # Generic base
+│   ├── UserRepository.cs
+│   └── PostRepository.cs
+└── UnitOfWork.cs
+
+DTOs/
+├── RegisterRequest.cs
+├── LoginRequest.cs
+├── PostRequest.cs                   # CreatePostDto, UpdatePostDto
+└── PostResponse.cs                  # PostResponse, PostUserResponse
+
+Models/
+├── User.cs
+└── Post.cs
 ```
 
-**Views:** `Views/Feature/Action.cshtml`
-```
-Views/
-├── Auth/
-│   ├── Login.cshtml
-│   └── Register.cshtml
-├── Posts/
-│   ├── Index.cshtml
-│   └── Create.cshtml
-```
+---
+
+## New Feature Checklist
+
+When adding a new feature, verify every item:
+
+- [ ] **Model** created in `Models/` with proper annotations
+- [ ] **Repository interface** extends `IRepository<T>` in `Core/Interfaces/`
+- [ ] **Repository implementation** extends `Repository<T>` in `Infrastructure/Repositories/`
+- [ ] **UnitOfWork** updated with new repository property
+- [ ] **Service interface** in `Core/Interfaces/` returns `Result<T>`
+- [ ] **Service implementation** in `Application/Services/` with validation and error codes
+- [ ] **Request DTOs** with data annotations in `DTOs/`
+- [ ] **Response DTOs** with `FromModel()` factory in `DTOs/`
+- [ ] **Controller** with try-catch, `MapError`, response DTOs
+- [ ] **DI registration** in `Program.cs`
+- [ ] **Tests** in proper subdirectory with FluentAssertions
+- [ ] **All 56 tests pass** (`dotnet test`)
+- [ ] **Build succeeds** (`dotnet build`)
 
 ---
 
-## 🚀 Quick Checklist for New Features
+## Enforcement
 
-When adding a new feature, follow this checklist:
+These are mandatory standards. All pull requests must:
 
-- [ ] **Controller**: Inherits from BaseController
-- [ ] **ViewModel**: Defined in controller file with `#region ViewModels`
-- [ ] **View**: Uses `@model YourViewModel`
-- [ ] **Service**: Interface in `Core/Interfaces/`, implementation in `Application/Services/`
-- [ ] **Repository**: Interface extends `IRepository<T>`, implementation extends `Repository<T>`
-- [ ] **Validation**: Data annotations on ViewModel properties
-- [ ] **Error Handling**: Try-catch in controller, returns Result<T> from service
-- [ ] **Authentication**: Check `AuthToken` cookie before accessing protected resources
-- [ ] **CSRF Protection**: `[ValidateAntiForgeryToken]` on POST actions
-- [ ] **CSS**: Component styles in `wwwroot/css/components/`, page styles in `pages/`
-- [ ] **Security**: User input escaped, passwords hashed, cookies HttpOnly+Secure
-- [ ] **DI Registration**: Service registered in `Program.cs`
-- [ ] **Tests**: Created/updated tests for new/modified functionality (MANDATORY)
-- [ ] **Test Coverage**: Minimum coverage requirements met
-- [ ] **All Tests Pass**: `dotnet test` runs successfully
+1. Follow all rules in this document
+2. Include tests for all new/modified features
+3. All tests pass (`dotnet test`)
+4. Build without errors
+5. Pass code review
+
+**PRs without tests = automatic rejection.**
+**Failing tests = PR blocked.**
 
 ---
 
-## 📚 Related Documentation
-
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Overall architecture patterns
-- [MVC_ARCHITECTURE.md](MVC_ARCHITECTURE.md) - MVC structure and best practices
-- [CSS_ARCHITECTURE.md](CSS_ARCHITECTURE.md) - CSS organization
-- [THEME_GUIDE.md](THEME_GUIDE.md) - Design system and CSS variables
-- [QUICKSTART.md](QUICKSTART.md) - Running the application
-- [MVC_MIGRATION.md](MVC_MIGRATION.md) - Understanding the MVC migration
-
----
-
-## ⚖️ Enforcement
-
-**These are MANDATORY standards.** All pull requests must:
-1. ✅ Follow these coding standards (38 rules)
-2. ✅ Use existing reusable components
-3. ✅ **Include tests for all new/modified features** ⚠️ **NON-NEGOTIABLE**
-4. ✅ **All tests pass (dotnet test)** ⚠️ **BLOCKING REQUIREMENT**
-5. ✅ Pass code review checklist
-6. ✅ Build without errors
-7. ✅ Include appropriate documentation updates
-
-**Non-compliance will result in PR rejection.**
-
-**Testing is MANDATORY:**
-- ❌ PRs without tests → Automatic rejection
-- ❌ Failing tests → PR blocked until fixed
-- ✅ Complete test coverage → Faster review & merge
-
----
-
-**Last Updated:** April 13, 2026  
-**Version:** 2.0  
-**Maintained by:** TruePal Development Team
+**Last Updated:** April 15, 2026
+**Version:** 3.0

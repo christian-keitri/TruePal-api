@@ -1,262 +1,151 @@
 # TruePal.Api - Quick Start Guide
 
-## 🚀 Your Application is Now Scalable!
+## Prerequisites
 
-Your login and signup Razor pages are now connected to the database with a professional, enterprise-grade architecture.
+- .NET 10 SDK
+- A terminal / command line
 
-## ✅ What's Working
-
-- ✅ Login page at `/Login`
-- ✅ Registration page at `/Register`
-- ✅ API endpoints at `/api/auth/login` and `/api/auth/register`
-- ✅ Database connection (SQLite)
-- ✅ Input validation
-- ✅ Error handling
-- ✅ Request logging
-- ✅ JWT authentication
-
-## 🏃 Run the Application
+## Setup
 
 ```bash
+# 1. Restore dependencies
+dotnet restore
+
+# 2. Create / update the database
+dotnet ef database update
+
+# 3. Run the application
 dotnet run
 ```
 
-Then open your browser to:
-- **Home Page**: http://localhost:5000/
-- **Login**: http://localhost:5000/Auth/Login
-- **Register**: http://localhost:5000/Auth/Register
-- **Dashboard**: http://localhost:5000/Dashboard/Index
-- **Profile**: http://localhost:5000/Profile/Index
-- **API Docs**: http://localhost:5000/openapi (in development mode)
+The app runs at `https://localhost:5001` (or `http://localhost:5000`).
 
-## 📝 Test the API
+---
+
+## Try the API
 
 ### Register a User
+
 ```bash
-curl -X POST http://localhost:5000/api/auth/register \
+curl -X POST https://localhost:5001/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "john",
-    "email": "john@example.com",
-    "password": "securepass123"
+    "username": "testuser",
+    "email": "test@example.com",
+    "password": "Password123!"
   }'
-```
-
-**Response (Success):**
-```json
-{
-  "id": 1,
-  "username": "john",
-  "email": "john@example.com"
-}
-```
-
-**Response (Validation Error):**
-```json
-{
-  "errors": [
-    "Username must be at least 3 characters",
-    "Email is not valid",
-    "Password must be at least 6 characters"
-  ]
-}
 ```
 
 ### Login
+
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST https://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "john@example.com",
-    "password": "securepass123"
+    "email": "test@example.com",
+    "password": "Password123!"
   }'
 ```
 
-**Response:**
+Save the returned JWT token.
+
+### Create a Post
+
+```bash
+curl -X POST https://localhost:5001/api/posts \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "content": "Hello TruePal!",
+    "location": "Manila"
+  }'
+```
+
+### Get Recent Posts
+
+```bash
+curl https://localhost:5001/api/posts/recent?count=5
+```
+
+### Get Trending Posts
+
+```bash
+curl https://localhost:5001/api/posts/trending?count=5
+```
+
+### Track a View
+
+```bash
+curl -X POST https://localhost:5001/api/posts/1/views
+```
+
+### Update a Post (owner only)
+
+```bash
+curl -X PUT https://localhost:5001/api/posts/1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "content": "Updated content!",
+    "location": "Cebu"
+  }'
+```
+
+### Delete a Post (owner only)
+
+```bash
+curl -X DELETE https://localhost:5001/api/posts/1 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+---
+
+## Web UI
+
+| Page | URL | Description |
+|------|-----|-------------|
+| Home | `/` | Landing page with trending posts |
+| Login | `/Auth/Login` | Login form |
+| Register | `/Auth/Register` | Registration form |
+| Dashboard | `/Dashboard` | User dashboard (requires login) |
+| Profile | `/Profile` | User profile (requires login) |
+
+---
+
+## Running Tests
+
+```bash
+cd TruePal.Api.Tests
+dotnet test
+```
+
+All tests must pass before committing.
+
+---
+
+## Error Response Format
+
+All API errors return consistent JSON:
+
 ```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-}
-```
-
-## 🏗️ Architecture Overview
-
-Your app now has these layers:
-
-```
-┌─────────────────────────────────────┐
-│   MVC Controllers & Views           │ ← Presentation Layer
-├─────────────────────────────────────┤
-│    Services (IAuthService)          │ ← Business Logic Layer
-├─────────────────────────────────────┤
-│    Repositories (IUnitOfWork)       │ ← Data Access Layer
-├─────────────────────────────────────┤
-│    Database (SQLite)                │ ← Data Layer
-└─────────────────────────────────────┘
-```
-
-## 📚 Documentation
-
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Detailed architecture explanation
-- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - What changed and why
-
-## 🎯 Key Features
-
-### 1. Input Validation
-All inputs are validated before processing:
-- Username: 3-50 characters
-- Email: Valid email format
-- Password: Minimum 6 characters
-
-### 2. Error Handling
-Errors are handled gracefully with clear messages:
-```json
-// Multiple validation errors
-{"errors": ["Error 1", "Error 2"]}
-
 // Single error
-{"error": "Specific error message"}
+{ "error": "Post not found" }
+
+// Multiple validation errors
+{ "errors": ["Content is required", "Location too long"] }
 ```
 
-### 3. Logging
-Every request is logged with:
-- HTTP method and path
-- Response time in milliseconds
-- Status code
-- Database queries
+HTTP status codes: 400 (validation), 401 (auth), 403 (forbidden), 404 (not found), 500 (server error).
 
-### 4. Security
-- Passwords are hashed with BCrypt
-- JWT tokens for authentication
-- HTTPS redirection
-- SQL injection prevention
+---
 
-## 🔧 Configuration
+## Next Steps
 
-Edit `appsettings.json` to configure:
+- Read [ARCHITECTURE.md](ARCHITECTURE.md) to understand the system design
+- Read [CODING_STANDARDS.md](CODING_STANDARDS.md) before writing code (57 rules)
+- Read [TESTING_GUIDE.md](TESTING_GUIDE.md) for test patterns
+- Read [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow
 
-```json
-{
-  "Jwt": {
-    "Key": "your-super-secret-key-change-this-in-production",
-    "Issuer": "TruePal.Api",
-    "Audience": "TruePal.Client",
-    "ExpireMinutes": 60
-  }
-}
-```
+---
 
-## 📊 Database
-
-The app uses SQLite with Entity Framework Core. Database file: `truepal.db`
-
-### Run Migrations
-```bash
-dotnet ef migrations add MigrationName
-dotnet ef database update
-```
-
-### View Database
-```bash
-sqlite3 truepal.db
-.tables
-SELECT * FROM Users;
-```
-
-## 🧪 Testing
-
-### Test Registration Flow
-1. Go to http://localhost:5000/Register
-2. Fill in the form:
-   - Username: testuser
-   - Email: test@example.com
-   - Password: password123
-   - Confirm Password: password123
-3. Click "Register"
-4. Should redirect to Login page
-
-### Test Login Flow
-1. Go to http://localhost:5000/Login
-2. Enter credentials:
-   - Email: test@example.com
-   - Password: password123
-3. Click "Login"
-4. Should redirect to Home page with auth cookie set
-
-### Test Validation
-Try registering with:
-- Username: "ab" (too short)
-- Email: "notanemail" (invalid)
-- Password: "123" (too short)
-
-You should see all validation errors displayed.
-
-## 🐛 Troubleshooting
-
-### Database Errors
-```bash
-# Delete and recreate database
-rm truepal.db
-dotnet ef database update
-```
-
-### Port Already in Use
-```bash
-# Use a different port
-dotnet run --urls "http://localhost:5001"
-```
-
-### Build Errors
-```bash
-# Clean and rebuild
-dotnet clean
-dotnet build
-```
-
-## 📈 Next Steps
-
-1. **Add More Features**
-   - User profiles
-   - Posts/content
-   - Friends/connections
-   - Comments
-
-2. **Improve Security**
-   - Email verification
-   - Password reset
-   - Two-factor authentication
-   - Rate limiting
-
-3. **Add Testing**
-   - Unit tests
-   - Integration tests
-   - End-to-end tests
-
-4. **Deploy**
-   - Docker containerization
-   - Azure/AWS deployment
-   - CI/CD pipeline
-
-5. **Performance**
-   - Redis caching
-   - Database indexing
-   - CDN for static files
-
-## 💡 Tips
-
-- Use `dotnet watch run` for auto-reload during development
-- Check logs in the terminal for debugging
-- Use browser DevTools to inspect network requests
-- Read ARCHITECTURE.md to understand the design patterns
-
-## 🎉 You're All Set!
-
-Your application is now production-ready with:
-- Clean architecture
-- Proper error handling
-- Input validation
-- Security best practices
-- Logging and monitoring
-- Scalable design
-
-Happy coding! 🚀
+**Last Updated:** April 15, 2026

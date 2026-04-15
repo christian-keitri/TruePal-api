@@ -17,7 +17,7 @@
 
 📖 **Full Testing Guide**: [TESTING_GUIDE.md](TESTING_GUIDE.md)  
 📋 **Quick Template**: See [TESTING_GUIDE.md - Test Template](TESTING_GUIDE.md#-test-template)  
-✅ **Requirements**: [CODING_STANDARDS.md - Rules 27-34](CODING_STANDARDS.md#-testing-requirements)
+✅ **Requirements**: [CODING_STANDARDS.md - Rules 48-55](CODING_STANDARDS.md#testing-requirements)
 
 ## Before Every Commit:
 
@@ -42,9 +42,15 @@ For each feature:
 
 Example:
 ```csharp
-CreateUser_ShouldSucceed_WhenValidDataProvided
-GetUserById_ShouldReturnNull_WhenUserNotFound
+CreatePostAsync_ReturnsSuccess_WhenValidInput
+GetPostByIdAsync_ReturnsNotFound_WhenPostDoesNotExist
+DeletePostAsync_ReturnsForbidden_WhenWrongUser
 ```
+
+## Tools:
+- **xUnit** for test framework
+- **FluentAssertions** for assertions (`.Should().Be(...)`)
+- **In-memory SQLite** for database isolation
 
 ---
 
