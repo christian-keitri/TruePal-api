@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TruePal.Api.Controllers.Base;
@@ -102,6 +104,93 @@ public abstract class BaseController : Controller
             _logger.LogError(message);
         }
         SetError(message);
+    }
+
+    #endregion
+
+    #region JWT Token Helpers
+
+    /// <summary>
+    /// Get the current user ID from the JWT token stored in cookies
+    /// </summary>
+    protected int? GetCurrentUserId()
+    {
+        try
+        {
+            var token = Request.Cookies["AuthToken"];
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return userId;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse user ID from JWT token");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Get the current username from the JWT token
+    /// </summary>
+    protected string? GetCurrentUsername()
+    {
+        try
+        {
+            var token = Request.Cookies["AuthToken"];
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var usernameClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+            return usernameClaim?.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse username from JWT token");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Get the current user email from the JWT token
+    /// </summary>
+    protected string? GetCurrentUserEmail()
+    {
+        try
+        {
+            var token = Request.Cookies["AuthToken"];
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token);
+
+            var emailClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            return emailClaim?.Value;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse email from JWT token");
+            return null;
+        }
     }
 
     #endregion
