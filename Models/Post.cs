@@ -36,9 +36,8 @@ public class Post
     [ForeignKey("UserId")]
     public virtual User User { get; set; } = null!;
 
-    // Computed property for trending score
+    // Computed property for trending score (must match PostRepository.GetTrendingPostsAsync ordering)
     [NotMapped]
-    public double TrendingScore => 
-        (LikesCount * 2) + (CommentsCount * 3) + (ViewsCount * 0.5) 
-        - (DateTime.UtcNow - CreatedAt).TotalHours;
+    public double TrendingScore =>
+        (LikesCount * 2) + (CommentsCount * 3) + (ViewsCount * 0.5);
 }

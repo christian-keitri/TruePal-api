@@ -8,6 +8,7 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
     private IUserRepository? _userRepository;
+    private IPostRepository? _postRepository;
 
     public UnitOfWork(AppDbContext context)
     {
@@ -15,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public IUserRepository Users => _userRepository ??= new UserRepository(_context);
+    public IPostRepository Posts => _postRepository ??= new PostRepository(_context);
 
     public async Task<int> CompleteAsync()
     {

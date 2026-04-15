@@ -21,6 +21,7 @@ builder.Services.AddOpenApi();
 // Dependency Injection - Repositories and Services
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 // DATABASE CONFIG
 builder.Services.AddDbContext<AppDbContext>(options =>
