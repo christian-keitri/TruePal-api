@@ -7,7 +7,7 @@
     bottom: 20px;
     right: 20px;
     z-index: 10;
-    background: rgba(18, 18, 18, 0.95);
+    background: var(--color-dark-elevated);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: var(--radius-pill);
@@ -109,4 +109,19 @@
     .map-overlay-header p {
         font-size: 0.9rem;
     }
+}
+
+/* Light Mode Overlay Adjustments */
+[data-theme="light"] .auth-overlay {
+    background: var(--bg-white);
+    border: 1px solid var(--color-dark-border);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="light"] .auth-overlay h2 {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .auth-overlay p {
+    color: var(--text-secondary);
 }

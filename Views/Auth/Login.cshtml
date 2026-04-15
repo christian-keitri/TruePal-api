@@ -3,25 +3,30 @@
     ViewData["Title"] = "Login";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/components/floating-labels.css" asp-append-version="true">
+}
+
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Login</h2>
+                    <h2 class="card-title text-center mb-2">Sign in or create an account</h2>
+                    <p class="text-center text-muted mb-4">Discover and share amazing travel destinations</p>
                     
                     <form method="post" asp-action="Login" asp-controller="Auth">
                         <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
                         
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
+                        <div class="floating-label-group">
                             <input asp-for="Email" class="form-control" />
+                            <label asp-for="Email"></label>
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
+                        <div class="floating-label-group">
                             <input asp-for="Password" class="form-control" />
+                            <label asp-for="Password"></label>
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
 
@@ -31,11 +36,11 @@
                         </div>
 
                         <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            <button type="submit" class="btn btn-primary">Sign In</button>
                         </div>
 
                         <div class="text-center">
-                            <p class="mb-2">Don't have an account? <a asp-controller="Auth" asp-action="Register" style="color: var(--color-primary); font-weight: bold; text-decoration: underline;">Register here</a></p>
+                            <p class="mb-2">Don't have an account? <a asp-controller="Auth" asp-action="Register" style="color: var(--color-primary); font-weight: bold; text-decoration: underline;">Sign up here</a></p>
                             <p class="mb-0"><a asp-controller="Auth" asp-action="ForgotPassword" class="text-muted">Forgot your password?</a></p>
                         </div>
                     </form>
@@ -47,4 +52,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/components/floating-labels.js" asp-append-version="true"></script>
 }

@@ -1,0 +1,82 @@
+/* Floating Label Form Inputs Component */
+/* Modern Material Design-style floating labels for form inputs */
+
+.floating-label-group {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
+}
+
+.floating-label-group input {
+    width: 100%;
+    padding: var(--spacing-base);
+    font-size: 1rem;
+    border: 1px solid var(--color-primary-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-dark-elevated);
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+
+.floating-label-group input:focus,
+.floating-label-group input.has-value {
+    padding: var(--spacing-lg) var(--spacing-base) var(--spacing-sm) var(--spacing-base);
+}
+
+.floating-label-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.floating-label-group label {
+    position: absolute;
+    left: var(--spacing-base);
+    top: var(--spacing-base);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    pointer-events: none;
+    transition: all var(--transition-fast);
+    background-color: transparent;
+    padding: 0 var(--spacing-xs);
+    z-index: 1;
+}
+
+.floating-label-group input:focus+label,
+.floating-label-group input.has-value+label {
+    top: calc(var(--spacing-sm) * -1);
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    background-color: var(--color-dark-lighter);
+    padding: 0 var(--spacing-sm);
+    margin-left: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+}
+
+.floating-label-group input.has-value+label {
+    color: var(--text-secondary);
+}
+
+/* Password hint text */
+.password-hint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: var(--spacing-sm);
+    display: block;
+}
+
+/* Ensure validation messages don't interfere with label positioning */
+.floating-label-group .text-danger {
+    font-size: 0.875rem;
+    margin-top: var(--spacing-xs);
+    display: block;
+}
+
+/* Light mode adjustments for floating labels */
+[data-theme="light"] .floating-label-group input {
+    border-color: var(--color-dark-border);
+    background-color: var(--bg-white);
+}
+
+[data-theme="light"] .floating-label-group input:focus {
+    background-color: var(--bg-white);
+    border-color: var(--color-primary);
+}

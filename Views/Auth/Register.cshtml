@@ -3,47 +3,52 @@
     ViewData["Title"] = "Register";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/components/floating-labels.css" asp-append-version="true">
+}
+
 <div class="container">
     <div class="row justify-content-center mt-5">
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Create Account</h2>
+                    <h2 class="card-title text-center mb-2">Sign up here</h2>
+                    <p class="text-center text-muted mb-4">Join the community and start sharing</p>
                     
                     <form method="post" asp-action="Register" asp-controller="Auth">
                         <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
                         
-                        <div class="mb-3">
-                            <label asp-for="Username" class="form-label"></label>
+                        <div class="floating-label-group">
                             <input asp-for="Username" class="form-control" />
+                            <label asp-for="Username"></label>
                             <span asp-validation-for="Username" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
+                        <div class="floating-label-group">
                             <input asp-for="Email" class="form-control" />
+                            <label asp-for="Email"></label>
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
+                        <div class="floating-label-group">
                             <input asp-for="Password" class="form-control" />
+                            <label asp-for="Password"></label>
                             <span asp-validation-for="Password" class="text-danger"></span>
-                            <div class="form-text">Password must be at least 6 characters long.</div>
+                            <div class="password-hint">Password must be at least 6 characters long</div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <div class="floating-label-group">
                             <input asp-for="ConfirmPassword" class="form-control" />
+                            <label asp-for="ConfirmPassword"></label>
                             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                         </div>
 
                         <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary">Register</button>
+                            <button type="submit" class="btn btn-primary">Sign up</button>
                         </div>
 
                         <div class="text-center">
-                            <p class="mb-0">Already have an account? <a asp-controller="Auth" asp-action="Login" style="color: var(--color-primary); font-weight: bold; text-decoration: underline;">Login here</a></p>
+                            <p class="mb-0">Already have an account? <a asp-controller="Auth" asp-action="Login" style="color: var(--color-primary); font-weight: bold; text-decoration: underline;">Sign in here</a></p>
                         </div>
                     </form>
                 </div>
@@ -54,4 +59,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/components/floating-labels.js" asp-append-version="true"></script>
 }
