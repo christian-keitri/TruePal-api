@@ -22,6 +22,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 // DATABASE CONFIG
 builder.Services.AddDbContext<AppDbContext>(options =>
