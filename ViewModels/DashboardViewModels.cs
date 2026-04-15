@@ -52,10 +52,29 @@ public class ProfileViewModel
     [Display(Name = "Email Address")]
     public string Email { get; set; } = string.Empty;
 
+    public string? ProfilePictureUrl { get; set; }
+
+    public string? Bio { get; set; }
+
     [Display(Name = "Member Since")]
     public DateTime CreatedAt { get; set; }
 
     public int TotalPosts { get; set; }
 
     public List<PostCardViewModel> YourPosts { get; set; } = new();
+}
+
+public class EditProfileViewModel
+{
+    [Display(Name = "Bio")]
+    [StringLength(500, ErrorMessage = "Bio must not exceed 500 characters")]
+    public string? Bio { get; set; }
+
+    [Display(Name = "Profile Picture")]
+    public IFormFile? ProfilePicture { get; set; }
+
+    public string? CurrentProfilePictureUrl { get; set; }
+
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }

@@ -1,0 +1,151 @@
+@model EditProfileViewModel
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/components/profile.css" />
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="bi bi-pencil-square me-2 text-primary"></i>Edit Profile
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Success/Error Alerts -->
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Please correct the following errors:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="CurrentProfilePictureUrl" />
+
+                        <!-- Profile Picture Section -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="bi bi-image me-1"></i>Profile Picture
+                            </label>
+                            
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                @if (!string.IsNullOrEmpty(Model.CurrentProfilePictureUrl))
+                                {
+                                    <img src="@Model.CurrentProfilePictureUrl" 
+                                         alt="Current Profile Picture" 
+                                         class="profile-picture-preview">
+                                }
+                                else
+                                {
+                                    <div class="profile-avatar-preview">
+                                        <i class="bi bi-person-circle profile-icon-placeholder"></i>
+                                    </div>
+                                }
+                            </div>
+
+                            <input type="file" 
+                                   class="form-control" 
+                                   asp-for="ProfilePicture" 
+                                   accept="image/jpeg,image/png,image/gif,image/webp">
+                            <div class="form-text">
+                                Upload a new profile picture (JPG, PNG, GIF, or WEBP, max 5MB)
+                            </div>
+                            <span asp-validation-for="ProfilePicture" class="text-danger"></span>
+                        </div>
+
+                        <!-- Username (Read-only) -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-person me-1"></i>Username
+                            </label>
+                            <input type="text" class="form-control" value="@Model.Username" readonly disabled>
+                            <div class="form-text">Your username cannot be changed</div>
+                        </div>
+
+                        <!-- Email (Read-only for now) -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-envelope me-1"></i>Email
+                            </label>
+                            <input type="email" class="form-control" value="@Model.Email" readonly disabled>
+                            <div class="form-text">Email changes coming soon</div>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="mb-4">
+                            <label asp-for="Bio" class="form-label">
+                                <i class="bi bi-chat-left-text me-1"></i>Bio
+                            </label>
+                            <textarea asp-for="Bio" 
+                                      class="form-control" 
+                                      rows="4" 
+                                      maxlength="500"
+                                      placeholder="Tell us about yourself..."></textarea>
+                            <div class="form-text">
+                                <span id="bioCharCount">@(Model.Bio?.Length ?? 0)</span>/500 characters
+                            </div>
+                            <span asp-validation-for="Bio" class="text-danger"></span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Character counter for bio
+        document.addEventListener('DOMContentLoaded', function() {
+            const bioTextarea = document.getElementById('Bio');
+            const charCount = document.getElementById('bioCharCount');
+            
+            if (bioTextarea && charCount) {
+                bioTextarea.addEventListener('input', function() {
+                    charCount.textContent = this.value.length;
+                });
+            }
+        });
+    </script>
+}

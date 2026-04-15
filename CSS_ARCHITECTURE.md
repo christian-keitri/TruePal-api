@@ -59,6 +59,7 @@ TruePal.Api/
 - `cards.css` - Card components (post cards, user cards)
 - `panels.css` - Sliding panels and sidebars
 - `overlays.css` - Modals, auth overlays, floating UI
+- `profile.css` - Profile picture components (avatars, previews, placeholders)
 
 **Loading**: Load per-page as needed via `@section Styles`
 
@@ -218,10 +219,41 @@ Let's say you want to add a "comments section" component:
 - Minify CSS in production
 - Consider critical CSS for above-the-fold content
 
+## Component Reference
+
+### Profile Components (`css/components/profile.css`)
+
+Reusable profile picture and avatar components:
+
+**Classes:**
+- `.profile-picture-preview` - 100×100px circular profile picture for forms and previews
+- `.profile-picture-large` - 120×120px circular profile picture for profile pages
+- `.profile-icon-placeholder` - Large icon placeholder when no profile picture exists
+- `.profile-avatar-preview` - Container for avatar preview with centered content
+
+**Usage:**
+```cshtml
+@section Styles {
+    <link rel="stylesheet" href="~/css/components/profile.css" asp-append-version="true">
+}
+
+<!-- With image -->
+<img src="@Model.ProfilePictureUrl" class="profile-picture-preview" alt="Profile">
+
+<!-- Without image (placeholder) -->
+<div class="profile-avatar-preview">
+    <i class="bi bi-person-circle profile-icon-placeholder"></i>
+</div>
+```
+
+**Theme Support:** All profile components use CSS variables and support both dark and light modes.
+
+---
+
 ## Future Enhancements
 
 - [ ] Add dashboard-specific styles to `css/pages/dashboard.css`
-- [ ] Create profile card component
+- [x] Create profile picture component
 - [ ] Add animation utilities to theme
 - [ ] Implement dark mode via CSS variables
 - [ ] Create component library documentation
@@ -234,5 +266,5 @@ For questions about the architecture or to propose changes, please:
 3. Discuss in team meetings before major changes
 
 ---
-**Last Updated**: April 13, 2026  
+**Last Updated**: April 15, 2026  
 **Maintainers**: TruePal Development Team

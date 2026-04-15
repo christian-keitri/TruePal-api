@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using TruePal.Api.Application.Services;
 using TruePal.Api.Core.Interfaces;
 using FluentAssertions;
@@ -13,8 +16,12 @@ public class FileServiceTests : IDisposable
 
     public FileServiceTests()
     {
-        _fileService = new FileService(NullLogger<FileService>.Instance);
-        _testUploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        var mockEnv = new Mock<IWebHostEnvironment>();
+        var webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+        mockEnv.Setup(e => e.WebRootPath).Returns(webRootPath);
+        
+        _fileService = new FileService(mockEnv.Object, NullLogger<FileService>.Instance);
+        _testUploadsPath = Path.Combine(webRootPath, "uploads");
         
         // Ensure uploads directory exists for tests
         Directory.CreateDirectory(_testUploadsPath);
@@ -39,18 +46,18 @@ public class FileServiceTests : IDisposable
         // Arrange
         var fileName = "test-image.jpg";
         var content = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // JPEG header
-        var file = CreateFormFile(fileName, content, "image/jpeg");
+        var stream = new MemoryStream(content);
 
         // Act
-        var result = await _fileService.UploadFileAsync(file);
+        var result = await _fileService.UploadFileAsync(stream, fileName, "image/jpeg");
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().StartWith("/uploads/");
-        result.Value.Should().EndWith(".jpg");
+        result.Data.Should().StartWith("/uploads/");
+        result.Data.Should().EndWith(".jpg");
 
         // Cleanup
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", result.Value.TrimStart('/'));
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", result.Data.TrimStart('/'));
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -60,22 +67,22 @@ public class FileServiceTests : IDisposable
     [Fact]
     public async Task UploadFileAsync_NullFile_ReturnsError()
     {
-        // Act
-        var result = await _fileService.UploadFileAsync(null!);
+        // Act - Null stream will cause exception caught by FileService
+        var result = await _fileService.UploadFileAsync(null!, "test.jpg", "image/jpeg");
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain("No file was uploaded");
+        result.Error.Should().Be("An error occurred while uploading the file");
     }
 
     [Fact]
     public async Task UploadFileAsync_EmptyFile_ReturnsError()
     {
         // Arrange
-        var file = CreateFormFile("empty.jpg", Array.Empty<byte>(), "image/jpeg");
+        var stream = new MemoryStream(Array.Empty<byte>());
 
         // Act
-        var result = await _fileService.UploadFileAsync(file);
+        var result = await _fileService.UploadFileAsync(stream, "empty.jpg", "image/jpeg");
 
         // Assert
         result.IsSuccess.Should().BeFalse();
@@ -87,14 +94,14 @@ public class FileServiceTests : IDisposable
     {
         // Arrange
         var content = new byte[] { 0x01, 0x02, 0x03 };
-        var file = CreateFormFile("document.pdf", content, "application/pdf");
+        var stream = new MemoryStream(content);
 
         // Act
-        var result = await _fileService.UploadFileAsync(file);
+        var result = await _fileService.UploadFileAsync(stream, "document.pdf", "application/pdf");
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain("Invalid file extension. Only .jpg, .jpeg, .png, .gif, .webp are allowed");
+        result.Errors.Should().Contain(error => error.Contains("File type .pdf is not allowed"));
     }
 
     [Fact]
@@ -102,14 +109,14 @@ public class FileServiceTests : IDisposable
     {
         // Arrange
         var content = new byte[] { 0x01, 0x02, 0x03 };
-        var file = CreateFormFile("image.jpg", content, "application/octet-stream");
+        var stream = new MemoryStream(content);
 
         // Act
-        var result = await _fileService.UploadFileAsync(file);
+        var result = await _fileService.UploadFileAsync(stream, "image.jpg", "application/octet-stream");
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain("Invalid file type. Only image files are allowed");
+        result.Errors.Should().Contain(error => error.Contains("Content type application/octet-stream is not allowed"));
     }
 
     [Fact]
@@ -117,14 +124,14 @@ public class FileServiceTests : IDisposable
     {
         // Arrange
         var largeContent = new byte[6 * 1024 * 1024]; // 6MB
-        var file = CreateFormFile("large.jpg", largeContent, "image/jpeg");
+        var stream = new MemoryStream(largeContent);
 
         // Act
-        var result = await _fileService.UploadFileAsync(file);
+        var result = await _fileService.UploadFileAsync(stream, "large.jpg", "image/jpeg");
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain("File size exceeds the maximum allowed size of 5 MB");
+        result.Errors.Should().Contain(error => error.Contains("File size exceeds maximum allowed size"));
     }
 
     [Fact]
@@ -132,18 +139,18 @@ public class FileServiceTests : IDisposable
     {
         // Arrange
         var content = new byte[] { 0x52, 0x49, 0x46, 0x46 }; // RIFF header for WebP
-        var file = CreateFormFile("test-image.webp", content, "image/webp");
+        var stream = new MemoryStream(content);
 
         // Act
-        var result = await _fileService.UploadFileAsync(file);
+        var result = await _fileService.UploadFileAsync(stream, "test-image.webp", "image/webp");
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().StartWith("/uploads/");
-        result.Value.Should().EndWith(".webp");
+        result.Data.Should().StartWith("/uploads/");
+        result.Data.Should().EndWith(".webp");
 
         // Cleanup
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", result.Value.TrimStart('/'));
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", result.Data.TrimStart('/'));
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
@@ -175,7 +182,8 @@ public class FileServiceTests : IDisposable
 
         // Assert
         result.IsSuccess.Should().BeFalse();
-        result.Errors.Should().Contain("File not found");
+        result.Error.Should().Be("File not found");
+        result.ErrorCode.Should().Be(ErrorCodes.NotFound);
     }
 
     [Fact]

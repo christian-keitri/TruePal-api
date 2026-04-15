@@ -1,0 +1,30 @@
+/* Profile Component Styles */
+
+.profile-picture-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-circle);
+}
+
+.profile-picture-large {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: var(--radius-circle);
+}
+
+.profile-icon-placeholder {
+    font-size: 80px;
+    color: var(--color-primary);
+}
+
+.profile-avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: var(--radius-circle);
+    background-color: var(--color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

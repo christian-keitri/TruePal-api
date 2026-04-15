@@ -5,6 +5,7 @@ using Moq;
 using System.Security.Claims;
 using TruePal.Api.Controllers;
 using TruePal.Api.Core.Interfaces;
+using TruePal.Api.DTOs;
 using FluentAssertions;
 
 namespace TruePal.Api.Tests.Controllers;
@@ -32,8 +33,11 @@ public class ApiFilesControllerTests
         var file = CreateFormFile("test.jpg", new byte[] { 0xFF, 0xD8 }, "image/jpeg");
         var expectedPath = "/uploads/guid-test.jpg";
         
-        _mockFileService.Setup(x => x.UploadFileAsync(It.IsAny<IFormFile>()))
+        _mockFileService.Setup(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(Result<string>.Success(expectedPath));
+        
+        _mockFileService.Setup(x => x.GetFileUrl(expectedPath))
+            .Returns(expectedPath);
 
         // Act
         var result = await _controller.UploadFile(file);
@@ -43,8 +47,9 @@ public class ApiFilesControllerTests
         var okResult = result as OkObjectResult;
         okResult!.Value.Should().NotBeNull();
         
-        var responseData = okResult.Value!.GetType().GetProperty("filePath")?.GetValue(okResult.Value);
-        responseData.Should().Be(expectedPath);
+        var response = okResult.Value as FileUploadResponse;
+        response.Should().NotBeNull();
+        response!.FilePath.Should().Be(expectedPath);
     }
 
     [Fact]
@@ -67,10 +72,10 @@ public class ApiFilesControllerTests
     {
         // Arrange
         var file = CreateFormFile("test.pdf", new byte[] { 0x01 }, "application/pdf");
-        var errorMessage = "Invalid file type";
+        var errorMessages = new List<string> { "Invalid file type" };
         
-        _mockFileService.Setup(x => x.UploadFileAsync(It.IsAny<IFormFile>()))
-            .ReturnsAsync(Result<string>.Failure(errorMessage));
+        _mockFileService.Setup(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(Result<string>.Failure(errorMessages));
 
         // Act
         var result = await _controller.UploadFile(file);
@@ -81,7 +86,8 @@ public class ApiFilesControllerTests
         badResult!.Value.Should().NotBeNull();
         
         var errors = badResult.Value!.GetType().GetProperty("errors")?.GetValue(badResult.Value) as List<string>;
-        errors.Should().Contain(errorMessage);
+        errors.Should().NotBeNull();
+        errors.Should().Contain("Invalid file type");
     }
 
     [Fact]
@@ -113,10 +119,10 @@ public class ApiFilesControllerTests
     {
         // Arrange
         var file = CreateFormFile("large.jpg", new byte[6 * 1024 * 1024], "image/jpeg");
-        var errorMessage = "File size exceeds the maximum allowed size of 5 MB";
+        var errorMessages = new List<string> { "File size exceeds maximum allowed size" };
         
-        _mockFileService.Setup(x => x.UploadFileAsync(It.IsAny<IFormFile>()))
-            .ReturnsAsync(Result<string>.Failure(errorMessage));
+        _mockFileService.Setup(x => x.UploadFileAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(Result<string>.Failure(errorMessages));
 
         // Act
         var result = await _controller.UploadFile(file);
@@ -126,7 +132,8 @@ public class ApiFilesControllerTests
         var badResult = result as BadRequestObjectResult;
         
         var errors = badResult!.Value!.GetType().GetProperty("errors")?.GetValue(badResult.Value) as List<string>;
-        errors.Should().Contain(errorMessage);
+        errors.Should().NotBeNull();
+        errors.Should().Contain(err => err.Contains("File size exceeds"));
     }
 
     #endregion
@@ -146,11 +153,7 @@ public class ApiFilesControllerTests
         var result = await _controller.DeleteFile(filePath);
 
         // Assert
-        result.Should().BeOfType<OkObjectResult>();
-        var okResult = result as OkObjectResult;
-        
-        var message = okResult!.Value!.GetType().GetProperty("message")?.GetValue(okResult.Value);
-        message.Should().Be("File deleted successfully");
+        result.Should().BeOfType<NoContentResult>();
     }
 
     [Fact]
@@ -174,7 +177,7 @@ public class ApiFilesControllerTests
         var filePath = "/uploads/non-existent.jpg";
         
         _mockFileService.Setup(x => x.DeleteFileAsync(filePath))
-            .ReturnsAsync(Result<bool>.Failure("File not found"));
+            .ReturnsAsync(Result<bool>.Failure("File not found", ErrorCodes.NotFound));
 
         // Act
         var result = await _controller.DeleteFile(filePath);
@@ -183,12 +186,12 @@ public class ApiFilesControllerTests
         result.Should().BeOfType<NotFoundObjectResult>();
         var notFoundResult = result as NotFoundObjectResult;
         
-        var errors = notFoundResult!.Value!.GetType().GetProperty("errors")?.GetValue(notFoundResult.Value) as List<string>;
-        errors.Should().Contain("File not found");
+        var error = notFoundResult!.Value!.GetType().GetProperty("error")?.GetValue(notFoundResult.Value);
+        error.Should().Be("File not found");
     }
 
     [Fact]
-    public async Task DeleteFile_ServiceError_ReturnsNotFound()
+    public async Task DeleteFile_ServiceError_ReturnsBadRequest()
     {
         // Arrange
         var filePath = "/uploads/error.jpg";
@@ -201,11 +204,11 @@ public class ApiFilesControllerTests
         var result = await _controller.DeleteFile(filePath);
 
         // Assert
-        result.Should().BeOfType<NotFoundObjectResult>();
-        var notFoundResult = result as NotFoundObjectResult;
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badResult = result as BadRequestObjectResult;
         
-        var errors = notFoundResult!.Value!.GetType().GetProperty("errors")?.GetValue(notFoundResult.Value) as List<string>;
-        errors.Should().Contain(errorMessage);
+        var error = badResult!.Value!.GetType().GetProperty("error")?.GetValue(badResult.Value);
+        error.Should().Be(errorMessage);
     }
 
     #endregion

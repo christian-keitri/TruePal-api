@@ -10,16 +10,22 @@ public class ProfileController : BaseController
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPostService _postService;
+    private readonly IUserService _userService;
+    private readonly IFileService _fileService;
 
     public ProfileController(
         IUnitOfWork unitOfWork, 
         IPostService postService,
+        IUserService userService,
+        IFileService fileService,
         IConfiguration configuration, 
         ILogger<ProfileController> logger) 
         : base(logger, configuration)
     {
         _unitOfWork = unitOfWork;
         _postService = postService;
+        _userService = userService;
+        _fileService = fileService;
     }
 
     public async Task<IActionResult> Index()
@@ -54,6 +60,8 @@ public class ProfileController : BaseController
             {
                 Username = user.Username,
                 Email = user.Email,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                Bio = user.Bio,
                 CreatedAt = user.CreatedAt,
                 TotalPosts = posts.Count(),
                 YourPosts = posts.Select(p => new PostCardViewModel
@@ -77,6 +85,116 @@ public class ProfileController : BaseController
         {
             LogAndDisplayError("An error occurred while loading your profile.", ex);
             return RedirectToAction("Index", "Home");
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit()
+    {
+        // Check if user is logged in
+        if (!Request.Cookies.ContainsKey("AuthToken"))
+        {
+            return RedirectToActionWithError("Login", "Auth", "Please login to edit your profile");
+        }
+
+        try
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToActionWithError("Login", "Auth", "Invalid session. Please login again.");
+            }
+
+            var user = await _unitOfWork.Users.GetByIdAsync(userId.Value);
+            if (user == null)
+            {
+                return RedirectToActionWithError("Login", "Auth", "User not found. Please login again.");
+            }
+
+            var model = new EditProfileViewModel
+            {
+                Username = user.Username,
+                Email = user.Email,
+                Bio = user.Bio,
+                CurrentProfilePictureUrl = user.ProfilePictureUrl
+            };
+
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            LogAndDisplayError("An error occurred while loading the edit profile page.", ex);
+            return RedirectToAction("Index");
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(EditProfileViewModel model)
+    {
+        // Check if user is logged in
+        if (!Request.Cookies.ContainsKey("AuthToken"))
+        {
+            return RedirectToActionWithError("Login", "Auth", "Please login to edit your profile");
+        }
+
+        try
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToActionWithError("Login", "Auth", "Invalid session. Please login again.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string? profilePictureUrl = model.CurrentProfilePictureUrl;
+
+            // Handle profile picture upload
+            if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
+            {
+                using (var stream = model.ProfilePicture.OpenReadStream())
+                {
+                    var uploadResult = await _fileService.UploadFileAsync(
+                        stream, 
+                        model.ProfilePicture.FileName, 
+                        model.ProfilePicture.ContentType
+                    );
+
+                    if (!uploadResult.IsSuccess)
+                    {
+                        AddErrors(uploadResult.Errors);
+                        return View(model);
+                    }
+
+                    // Delete old profile picture if exists
+                    if (!string.IsNullOrEmpty(model.CurrentProfilePictureUrl))
+                    {
+                        await _fileService.DeleteFileAsync(model.CurrentProfilePictureUrl);
+                    }
+
+                    profilePictureUrl = uploadResult.Data;
+                }
+            }
+
+            // Update profile
+            var result = await _userService.UpdateProfileAsync(userId.Value, model.Bio, profilePictureUrl);
+
+            if (!result.IsSuccess)
+            {
+                AddErrors(result.Errors);
+                return View(model);
+            }
+
+            return RedirectToActionWithSuccess("Index", "Profile", "Profile updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            LogAndDisplayError("An error occurred while updating your profile.", ex);
+            return View(model);
         }
     }
 
