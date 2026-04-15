@@ -22,6 +22,12 @@ public class Result<T>
         Error = error;
         Errors = errors ?? new List<string>();
         ErrorCode = errorCode;
+        
+        // Add single error to Errors list if provided and Errors list is empty
+        if (!string.IsNullOrEmpty(error) && Errors.Count == 0)
+        {
+            Errors.Add(error);
+        }
     }
 
     public static Result<T> Success(T data) => new(true, data, null);
@@ -44,6 +50,12 @@ public class Result
         Error = error;
         Errors = errors ?? new List<string>();
         ErrorCode = errorCode;
+        
+        // Add single error to Errors list if provided and Errors list is empty
+        if (!string.IsNullOrEmpty(error) && Errors.Count == 0)
+        {
+            Errors.Add(error);
+        }
     }
 
     public static Result Success() => new(true, null);

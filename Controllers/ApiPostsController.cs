@@ -244,16 +244,27 @@ public class ApiPostsController : ControllerBase
 
     private IActionResult MapError(string? error, string? errorCode, List<string>? errors = null)
     {
-        if (errors != null && errors.Count > 0)
+        // If we have multiple errors or validation errors, return BadRequest with errors list
+        if (errors != null && errors.Count > 1)
         {
             return BadRequest(new { errors });
         }
+        
+        // If errorCode is Validation, return BadRequest
+        if (errorCode == ErrorCodes.Validation)
+        {
+            if (errors != null && errors.Count > 0)
+            {
+                return BadRequest(new { errors });
+            }
+            return BadRequest(new { error });
+        }
 
+        // Map specific error codes to appropriate HTTP status codes
         return errorCode switch
         {
             ErrorCodes.NotFound => NotFound(new { error }),
             ErrorCodes.Forbidden => StatusCode(403, new { error }),
-            ErrorCodes.Validation => BadRequest(new { error }),
             _ => BadRequest(new { error })
         };
     }
