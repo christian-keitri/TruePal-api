@@ -4,7 +4,8 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/components/profile.css" />
+    <link rel="stylesheet" href="~/css/components/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components/modals.css" asp-append-version="true" />
 }
 
 <div class="container">
@@ -283,10 +284,6 @@
 
 <!-- Create Post Modal -->
 <partial name="Components/_CreatePostModal" />
-
-@section Styles {
-    <link rel="stylesheet" href="~/css/components/modals.css" asp-append-version="true">
-}
 
 @section Scripts {
     <script src="~/js/components/create-post-modal.js" asp-append-version="true"></script>
